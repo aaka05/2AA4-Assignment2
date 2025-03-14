@@ -1,19 +1,15 @@
 package ca.mcmaster.se2aa4.island.team31;
 
-import ca.mcmaster.se2aa4.island.team31.Interfaces.DroneActions;
+import org.json.JSONObject;
+import ca.mcmaster.se2aa4.island.team31.Interfaces.DroneAction;
 
-public class Fly implements DroneActions {
-
-    private final DroneController controls;
+public class Fly implements DroneAction {
     public Fly(DroneController controls) {
-        this.controls = controls;
     }
-    
+
     @Override
     public void action() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'action'");
+        JSONObject decision = new JSONObject();
+        decision.put("action", "fly");
     }
-
-    
 }
