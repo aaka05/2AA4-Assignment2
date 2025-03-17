@@ -1,11 +1,12 @@
-package ca.mcmaster.se2aa4.island.team31;
+package ca.mcmaster.se2aa4.island.team31.Drone;
 
 public class Battery {
     private int batteryLevel;
-    //private final int initialBatteryLevel;
 
     public Battery(int initialBatteryLevel) {
-        //this.initialBatteryLevel = initialBatteryLevel;
+        if (initialBatteryLevel < 0){
+            throw new IllegalArgumentException("Battery level cannot be negative");
+        }
         this.batteryLevel = initialBatteryLevel;
     }
 
