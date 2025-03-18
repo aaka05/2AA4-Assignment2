@@ -7,14 +7,20 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Drone.Battery;
 
-public class DroneController {
-    private Battery battery;
-    private Queue<JSONObject> actions;
+public class DroneController{
+    private Direction direction;
+    int level;
+    int x;
+    int y;
 
-    public DroneController(Battery battery) {
-        this.battery = battery;
-        this.actions = new LinkedList<>();
-        this.battery = battery;
+    public DroneController(Integer level, String start){
+        this.level = level;
+        try{
+            this.direction = Direction.valueOf(start);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid direction: " + Starting);
+
+        }
     }
 
     public void addAction(JSONObject decision) {
