@@ -106,5 +106,50 @@ public class DroneController{
         public JSONObject getNextAction() {
             return actionQueue.poll();
         }
+
+        
+        /* Moves the drone diagonally (Southeast) until it reaches land.*/
+        public void goInitialDiagonal() {
+            direction = CardinalDirection.E; // Start moving East
+            boolean moveSouthNext = true; // Alternate between East and South
+
+            while (true) {
+                // Check for land using ECHO (replace Echo class with direct JSON command)
+                JSONObject echoAction = new JSONObject()
+                        .put("action", "echo")
+                        .put("parameters", new JSONObject().put("direction", direction));
+                addAction(echoAction);
+
+                // Get the response from the game engine
+                JSONObject response = getNextAction(); // Processes the response
+                JSONObject extras = response.getJSONObject("extras");
+                String found = extras.getString("found");
+
+                // Stop moving if land is found
+                if ("GROUND".equals(found)) {
+                    System.out.println("✅ Land detected.");
+                    break;
+                }
+
+                // Move diagonally (switching between East and South)
+                if (moveSouthNext) {
+                    addAction(new JSONObject()
+                            .put("action", "heading")
+                            .put("parameters", new JSONObject().put("direction", "S")));
+                } else {
+                    addAction(new JSONObject()
+                            .put("action", "heading")
+                            .put("parameters", new JSONObject().put("direction", "E")));
+                }
+                moveSouthNext = !moveSouthNext; // Alternate direction
+
+                // Move forward
+                addAction(new JSONObject().put("action", "fly"));
+            }
+        }
+
+
+       
     }
+
     
