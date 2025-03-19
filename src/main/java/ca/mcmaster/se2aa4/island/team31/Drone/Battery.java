@@ -23,6 +23,7 @@ public class Battery {
     }
 
     public boolean goHome(int x, int y, int costPerMove){
+        //cost to go home is the sum of the current x and y coordinates multiplied by the cost per move
         int costToGoHome = (x + y) * costPerMove;
         return batteryLevel <= costToGoHome;
     }

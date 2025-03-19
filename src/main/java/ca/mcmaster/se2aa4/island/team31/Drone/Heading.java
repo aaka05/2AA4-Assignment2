@@ -9,9 +9,9 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.DroneAction;
 public class Heading implements DroneAction {
 
     private DroneController controls;
-    private Direction direction;
+    private Direction.CardinalDirection direction;
 
-    public Heading(DroneController controls, Direction direction){
+    public Heading(DroneController controls, Direction.CardinalDirection direction){
             this.controls = controls;
             this.direction = direction;
     }
