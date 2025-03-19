@@ -25,7 +25,6 @@ public class Explorer implements IExplorerRaid {
         logger.info("Battery level is {}", batteryLevel);
 
         drone = new DroneController(batteryLevel, direction);
-        drone.goInitialDiagonal();
     }
 
     @Override
@@ -33,6 +32,8 @@ public class Explorer implements IExplorerRaid {
         JSONObject decision = new JSONObject();
         decision.put("action", "fly"); // we stop the exploration immediately
         logger.info("** Decision: {}",decision.toString());
+        drone.goInitialDiagonal();
+
         return decision.toString();
     }
 

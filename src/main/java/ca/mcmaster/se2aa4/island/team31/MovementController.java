@@ -18,27 +18,31 @@ public class MovementController {
         this.direction = startDirection;
     }
 
-    // Moves forward and updates coordinates
+    // Moves forward and updates position
     public JSONObject moveForward() {
         JSONObject move = new Fly(droneController).action();
         updatePosition();
         return move;
     }
 
+    // Changes direction based on input
+    public JSONObject changeDirection(String newDirection) {
+        CardinalDirection newDir = CardinalDirection.valueOf(newDirection);
+        JSONObject turn = new Heading(droneController, newDir).action();
+        this.direction = newDir;
+        return turn;
+    }
+
     // Turns left and updates direction
     public JSONObject turnLeft() {
         CardinalDirection newDirection = leftDirection();
-        JSONObject turn = new Heading(droneController, newDirection).action();
-        this.direction = newDirection;
-        return turn;
+        return changeDirection(newDirection.toString());
     }
 
     // Turns right and updates direction
     public JSONObject turnRight() {
         CardinalDirection newDirection = rightDirection();
-        JSONObject turn = new Heading(droneController, newDirection).action();
-        this.direction = newDirection;
-        return turn;
+        return changeDirection(newDirection.toString());
     }
 
     // Updates position based on direction
