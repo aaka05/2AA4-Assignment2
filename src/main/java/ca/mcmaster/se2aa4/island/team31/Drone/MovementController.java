@@ -100,5 +100,10 @@ public class MovementController extends ExplorerDrone implements Actions {
     public CardinalDirection getDirection() {
         return direction;
     }
+
+    @Override
+    public int getInitialBatteryLevel() {
+        return this.battery.getInitialBatteryLevel();
+    }
     
 }

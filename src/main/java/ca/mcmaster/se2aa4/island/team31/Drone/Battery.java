@@ -18,6 +18,10 @@ public class Battery {
         return this.batteryLevel;
     }
 
+    public int getInitialBatteryLevel() {
+        return this.batteryLevel;
+    }
+
     public int getBatteryLevel() {
         return batteryLevel;
     }

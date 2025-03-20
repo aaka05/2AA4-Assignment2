@@ -18,6 +18,8 @@ public interface Actions {
 
     public void useBattery(int batteryLevel);
 
+    public int getInitialBatteryLevel();
+
     public int getX();
 
     public int getY();
