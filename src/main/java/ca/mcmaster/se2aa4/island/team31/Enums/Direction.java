@@ -1,4 +1,4 @@
-package ca.mcmaster.se2aa4.island.team31;
+package ca.mcmaster.se2aa4.island.team31.Enums;
 
 public class Direction {
     //drone can only move in these directions

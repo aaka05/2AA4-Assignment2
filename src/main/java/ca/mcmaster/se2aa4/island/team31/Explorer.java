@@ -12,7 +12,6 @@ import eu.ace_design.island.bot.IExplorerRaid;
 public class Explorer implements IExplorerRaid {
 
     private final Logger logger = LogManager.getLogger();
-    private DroneController drone;
 
     @Override
     public void initialize(String s) {
@@ -24,7 +23,6 @@ public class Explorer implements IExplorerRaid {
         logger.info("The drone is facing {}", direction);
         logger.info("Battery level is {}", batteryLevel);
 
-        drone = new DroneController(batteryLevel, direction);
     }
 
     @Override
@@ -32,7 +30,6 @@ public class Explorer implements IExplorerRaid {
         JSONObject decision = new JSONObject();
         decision.put("action", "fly"); // we stop the exploration immediately
         logger.info("** Decision: {}",decision.toString());
-        drone.goInitialDiagonal();
 
         return decision.toString();
     }
