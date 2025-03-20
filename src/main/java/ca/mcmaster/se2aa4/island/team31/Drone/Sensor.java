@@ -1,7 +1,7 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 
-import ca.mcmaster.Interface.ExplorerDrone;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
+import ca.mcmaster.se2aa4.island.team31.Interface.ExplorerDrone;
 
 public class Sensor extends ExplorerDrone {
     private Gps gps = new Gps();

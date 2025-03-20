@@ -1,7 +1,6 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
-import ca.mcmaster.Interface.Actions;
 
 
 //get the direction of the drone

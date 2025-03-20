@@ -1,4 +1,4 @@
-package ca.mcmaster.Interface;
+package ca.mcmaster.se2aa4.island.team31.Interface;
 
 
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
