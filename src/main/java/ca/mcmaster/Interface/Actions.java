@@ -1,0 +1,29 @@
+package ca.mcmaster.Interface;
+
+
+import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
+
+
+public interface Actions {
+
+    public void moveForward();
+
+    public void turnLeft();
+
+    public void turnRight();
+
+    public void stop();
+
+    public int getBatteryLevel();
+
+    public void useBattery(int batteryLevel);
+
+    public int getX();
+
+    public int getY();
+
+    public Direction.CardinalDirection getDirection();
+
+
+}
+
