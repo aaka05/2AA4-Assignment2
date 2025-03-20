@@ -1,8 +1,8 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
-import ca.mcmaster.se2aa4.island.team31.Interface.Actions;
-import ca.mcmaster.se2aa4.island.team31.Interface.ExplorerDrone;
+import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
+import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 
 
 

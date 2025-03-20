@@ -1,4 +1,4 @@
-package ca.mcmaster.se2aa4.island.team31.Interface;
+package ca.mcmaster.se2aa4.island.team31.Interfaces;
 
 import org.json.JSONObject;
 
