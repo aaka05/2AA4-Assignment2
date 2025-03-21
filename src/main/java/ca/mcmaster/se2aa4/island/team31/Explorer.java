@@ -12,6 +12,7 @@ import eu.ace_design.island.bot.IExplorerRaid;
 public class Explorer implements IExplorerRaid {
 
     private final Logger logger = LogManager.getLogger();
+    private DroneController droneController;
 
     @Override
     public void initialize(String s) {
@@ -23,27 +24,36 @@ public class Explorer implements IExplorerRaid {
         logger.info("The drone is facing {}", direction);
         logger.info("Battery level is {}", batteryLevel);
 
+        droneController = new DroneController(batteryLevel, direction);
+
     }
 
     @Override
     public String takeDecision() {
-        JSONObject decision = new JSONObject();
-        decision.put("action", "fly"); // we stop the exploration immediately
-        logger.info("** Decision: {}",decision.toString());
+        logger.info("** Taking decision");
 
-        return decision.toString();
+        JSONObject command = droneController.takeDecision();
+        logger.info("** Action done: {}", command.toString());
+        //droneController.updateDrone(command);
+
+        return command.toString();
     }
 
     @Override
     public void acknowledgeResults(String s) {
         JSONObject response = new JSONObject(new JSONTokener(new StringReader(s)));
         logger.info("** Response received:\n"+response.toString(2));
+
         Integer cost = response.getInt("cost");
         logger.info("The cost of the action was {}", cost);
+
         String status = response.getString("status");
         logger.info("The status of the drone is {}", status);
+
         JSONObject extraInfo = response.getJSONObject("extras");
         logger.info("Additional information received: {}", extraInfo);
+
+        droneController.updateDrone(response);
     }
 
     @Override
