@@ -4,17 +4,16 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.DroneController;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
+import eu.ace_design.island.game.Directions;
 
 public class DroneActions {
 
     public JSONObject heading(Direction.CardinalDirection direction) {
         JSONObject decision = new JSONObject();
         JSONObject parameters = new JSONObject();
-
         decision.put("action", "heading");
-        decision.put("direction", direction);
+        parameters.put("direction", direction);
         decision.put("parameters", parameters);
-
         return decision;
     }
 

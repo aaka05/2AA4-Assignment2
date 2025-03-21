@@ -11,7 +11,6 @@ public class FindIsland extends State {
     private boolean turnRight;
     private boolean turnLeft;
     private boolean echo;
-    // private boolean moveForward;
 
     public FindIsland(Actions drone, Sensor sensor) {
         super(drone, sensor);
@@ -22,34 +21,28 @@ public class FindIsland extends State {
 
     @Override
     public State getNextState(JSONObject command) {
-        // first check if we found the island
+        //  Check if land was found and switch state
         if (landDetector.foundGround(command)) {
-            // return new OnIsland(drone, sensor);
+            int distance = landDetector.getDistance(command);
+            return new GoToIsland(drone, sensor, distance); //  Make sure GoToIsland exists
         }
-        
-        // do our zigzag pattern
-        if(echo) {
-            // check what's in front of us
+
+        //  Zig-zag movement pattern with echo
+        if (echo) {
             sensor.echoForward();
             echo = false;
-        }
-        else if(turnRight) {
-            // when we turn right, we move diagonally down-right
-            drone.turnRight();  // this actually moves us diagonally
+        } else if (turnRight) {
+            drone.turnRight();  // move diagonally down-right
             turnRight = false;
             turnLeft = true;
-            echo = true;        // echo after each turn
-        }
-        else if(turnLeft) {
-            // when we turn left, we move diagonally down-left
-            drone.turnLeft();   // this actually moves us diagonally
+            echo = true;
+        } else if (turnLeft) {
+            drone.turnLeft();   // move diagonally down-left
             turnLeft = false;
             turnRight = true;
-            echo = true;        // echo after each turn
+            echo = true;
         }
-        
+
         return this;
     }
-
-
 }

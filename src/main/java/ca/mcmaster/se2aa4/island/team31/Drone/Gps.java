@@ -1,53 +1,49 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 
+import java.util.EnumMap;
+import java.util.Map;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 
-
-//get the direction of the drone
+// GPS system for handling the drone's directional movement
 public class Gps {
 
-    //Circular array of directions
-    private static final CardinalDirection[] RIGHT_TURNS = {CardinalDirection.N, CardinalDirection.E, CardinalDirection.S, CardinalDirection.W};
-    private static final CardinalDirection[] LEFT_TURNS = {CardinalDirection.N, CardinalDirection.W, CardinalDirection.S, CardinalDirection.E};
-    private static final int[][] MOVEMENTS = {
-        {0, 1},   // North -> move up
-        {0, -1},  // South -> move down
-        {1, 0},   // East -> move right
-        {-1, 0}   // West -> move left
-    };
+    private final Map<CardinalDirection, CardinalDirection> rightTurns;
+    private final Map<CardinalDirection, CardinalDirection> leftTurns;
+    private final Map<CardinalDirection, int[]> movements;
 
     public Gps() {
-        // Constructor remains empty as we're using arrays
+        // Initialize directional mappings using EnumMap for efficiency
+        this.rightTurns = new EnumMap<>(CardinalDirection.class);
+        this.rightTurns.put(CardinalDirection.N, CardinalDirection.E);
+        this.rightTurns.put(CardinalDirection.E, CardinalDirection.S);
+        this.rightTurns.put(CardinalDirection.S, CardinalDirection.W);
+        this.rightTurns.put(CardinalDirection.W, CardinalDirection.N);
+
+        this.leftTurns = new EnumMap<>(CardinalDirection.class);
+        this.leftTurns.put(CardinalDirection.N, CardinalDirection.W);
+        this.leftTurns.put(CardinalDirection.W, CardinalDirection.S);
+        this.leftTurns.put(CardinalDirection.S, CardinalDirection.E);
+        this.leftTurns.put(CardinalDirection.E, CardinalDirection.N);
+
+        this.movements = new EnumMap<>(CardinalDirection.class);
+        this.movements.put(CardinalDirection.N, new int[]{0, 1});  // Move up
+        this.movements.put(CardinalDirection.S, new int[]{0, -1}); // Move down
+        this.movements.put(CardinalDirection.E, new int[]{1, 0});  // Move right
+        this.movements.put(CardinalDirection.W, new int[]{-1, 0}); // Move left
     }
 
     // Get the direction when turning right
     public CardinalDirection getRight(CardinalDirection currHeading) {
-        int index = getDirectionIndex(currHeading);
-        return RIGHT_TURNS[(index + 1) % RIGHT_TURNS.length];
+        return rightTurns.get(currHeading);
     }
 
     // Get the direction when turning left
     public CardinalDirection getLeft(CardinalDirection currHeading) {
-        int index = getDirectionIndex(currHeading);
-        return LEFT_TURNS[(index + 1) % LEFT_TURNS.length];
+        return leftTurns.get(currHeading);
     }
 
     // Get the movement when moving forward
     public int[] getForwardMovement(CardinalDirection currHeading) {
-        int index = getDirectionIndex(currHeading);
-        return MOVEMENTS[index];
-    }
-
-    // Helper method to get the index of the direction
-    private int getDirectionIndex(CardinalDirection currHeading) {
-        for (int i = 0; i < RIGHT_TURNS.length; i++) {
-            if (RIGHT_TURNS[i] == currHeading) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException("Unknown direction: " + currHeading);
+        return movements.get(currHeading);
     }
 }
-
-
-    
