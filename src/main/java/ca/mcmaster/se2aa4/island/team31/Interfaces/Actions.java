@@ -26,6 +26,8 @@ public interface Actions {
 
     public Direction.CardinalDirection getDirection();
 
+    public Direction.CardinalDirection getSearchHeading();
+
 
 }
 
