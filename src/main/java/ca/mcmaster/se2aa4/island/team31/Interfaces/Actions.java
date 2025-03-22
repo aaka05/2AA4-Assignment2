@@ -26,6 +26,11 @@ public interface Actions {
 
     public Direction.CardinalDirection getDirection();
 
+    public boolean hasVisitedLocation();
+
+    public boolean isTurnPoint();
+
+    public void markAsTurnPoint();
 
 }
 
