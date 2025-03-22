@@ -1,9 +1,10 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
+import java.util.Set;
+
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
-
 
 
 public class MovementController extends ExplorerDrone implements Actions {
@@ -14,6 +15,8 @@ public class MovementController extends ExplorerDrone implements Actions {
     private int x;
     private int y;
     private int costPerAction;
+    private Set<String> visitedLocations;
+    private Set<String> turnPoints;
 
     private DroneActions droneActions = new DroneActions();
     
@@ -71,11 +74,6 @@ public class MovementController extends ExplorerDrone implements Actions {
         update(droneActions.stop());
     }
 
-    public void comeHome() {
-        //logic to go home
-    }
-
-
     @Override
     public int getBatteryLevel() {
         return battery.getBatteryLevel();
@@ -105,5 +103,34 @@ public class MovementController extends ExplorerDrone implements Actions {
     public int getInitialBatteryLevel() {
         return this.battery.getInitialBatteryLevel();
     }
+
+
+    @Override
+    public boolean hasVisitedLocation() {
+        String positionKey = x + "," + y; // unique key for (x, y)
+        if (visitedLocations.contains(positionKey)) {
+            return true; // already visited this location
+        }
+        visitedLocations.add(positionKey); // add new location to the set
+        return false;
+    }
+
+    @Override
+    public boolean isTurnPoint() {
+        String positionKey = x + "," + y;
+        if (turnPoints.contains(positionKey)) {
+            return true; // current location is known to be a point to make a turn
+        }
+        return false;
+    }
+
+    @Override
+    public void markAsTurnPoint() {
+        String positionKey = x + "," + y;
+        turnPoints.add(positionKey);
+    }
+
+
+    
     
 }
