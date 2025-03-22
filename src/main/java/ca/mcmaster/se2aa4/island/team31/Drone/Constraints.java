@@ -35,15 +35,20 @@ public class Constraints {
         int currentBattery = droneController.getBatteryLevel();
         int initialBattery = droneController.getInitialBatteryLevel();
 
-        if (currentBattery < (initialBattery * 0.5)) {
+        if (currentBattery < (initialBattery * 0.25)) {
             logger.warn("Battery critically low! Returning to base.");
             return true;
         }
         return false;
     }
 
-    // Optional: Check if there’s enough battery to continue
+    // Check if there's enough battery to continue
     public boolean enoughBattery() {
+        // If we should return home, we don't have enough battery to continue exploring
+        if (shouldReturnHome()) {
+            return false;
+        }
+        // Keep the minimum battery check as an additional safeguard
         return droneController.getBatteryLevel() >= (droneController.getInitialBatteryLevel() * 0.007);
     }
 }
