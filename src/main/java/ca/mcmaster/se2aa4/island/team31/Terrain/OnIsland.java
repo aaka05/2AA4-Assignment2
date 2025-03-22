@@ -51,7 +51,7 @@ public class OnIsland extends State {
                 if(revisitedLocationsCount > (int)(0*6 * totalScannedSteps)){
                     //return new RefindIsland(this.drone, this.sensor);
                  }
-                return new MakeTurn(this.drone, this.sensor)
+                return new MakeTurn(this.drone, this.sensor);
             }
         }
 
@@ -72,11 +72,13 @@ public class OnIsland extends State {
                 // adding site to report
                 //for (String site : sites) {
                     //addSiteToReport(site);
-                }
+                //}
             }
 
             if (inOcean(response) && prevFoundLand){
-                drone.stop();
+                exitingIsland = true;
+                sensor.echoForward();
+                return this;
             }
             else if(!inOcean(response) && !prevFoundLand){
                 prevFoundLand = true;
@@ -87,10 +89,21 @@ public class OnIsland extends State {
                 shouldScan = true;
             }
         } else if(shouldScan){
+            totalScannedSteps++;
             logger.info("Scanning");
-            sensor.scan();
+
+            if(drone.isTurnPoint()){
+                //return new RefindIsland(this.drone, this.sensor);
+            }
+
+            if (drone.hasVisitedLocation()){
+                revisitedLocationsCount++;
+                drone.moveForward();
+                prevFoundLand = true;
+            }else{sensor.scan();
             shouldFly = true;
             shouldScan = false;
+            }
         }
 
 
