@@ -17,15 +17,17 @@ public class Explorer implements IExplorerRaid {
     @Override
     public void initialize(String s) {
         logger.info("** Initializing the Exploration Command Center");
+
         JSONObject info = new JSONObject(new JSONTokener(new StringReader(s)));
-        logger.info("** Initialization info:\n {}",info.toString(2));
+        logger.info("** Initialization info:\n {}", info.toString(2));
+
         String direction = info.getString("heading");
         Integer batteryLevel = info.getInt("budget");
+
         logger.info("The drone is facing {}", direction);
         logger.info("Battery level is {}", batteryLevel);
 
         droneController = new DroneController(batteryLevel, direction);
-
     }
 
     @Override
@@ -33,16 +35,20 @@ public class Explorer implements IExplorerRaid {
         logger.info("** Taking decision");
 
         JSONObject command = droneController.takeDecision();
-        logger.info("** Action done: {}", command.toString());
-        //droneController.updateDrone(command);
 
+        if (command == null) {
+            logger.warn("DroneController returned null command. Stopping drone.");
+            return new JSONObject().put("action", "stop").toString();
+        }
+
+        logger.info("** Action done: {}", command.toString());
         return command.toString();
     }
 
     @Override
     public void acknowledgeResults(String s) {
         JSONObject response = new JSONObject(new JSONTokener(new StringReader(s)));
-        logger.info("** Response received:\n"+response.toString(2));
+        logger.info("** Response received:\n" + response.toString(2));
 
         Integer cost = response.getInt("cost");
         logger.info("The cost of the action was {}", cost);
@@ -60,5 +66,4 @@ public class Explorer implements IExplorerRaid {
     public String deliverFinalReport() {
         return "no creek found";
     }
-
 }

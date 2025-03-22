@@ -1,69 +1,61 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
+
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
-
-
+import org.json.JSONObject;
 
 public class MovementController extends ExplorerDrone implements Actions {
 
     private Gps gps = new Gps();
     private Battery battery;
-    private Direction.CardinalDirection direction;
+    private CardinalDirection direction;
     private int x;
     private int y;
     private int costPerAction;
 
     private DroneActions droneActions = new DroneActions();
-    
+
     public MovementController(Integer batteryAmount, String startPosition) {
         this.battery = new Battery(batteryAmount);
         this.costPerAction = costPerAction;
 
         x = 0;
-        y= 0;
-        //Integer.parseInt(startPosition.split(",")[1]);
-        //Integer.parseInt(startPosition.split(",")[0]);
+        y = 0;
 
-        try{
+        try {
             this.direction = CardinalDirection.valueOf(startPosition);
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
-
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            this.direction = CardinalDirection.E;
+        }
     }
-
-    private void movement() {
-        int[] movement = gps.getForwardMovement(this.direction);
-        this.x += movement[0];
-        this.y += movement[1];
-    }
-
 
     @Override
     public void moveForward() {
-        movement();
+        int[] movement = gps.getForwardMovement(this.direction);
+        x += movement[0];
+        y += movement[1];
         update(droneActions.fly());
     }
 
     @Override
     public void turnRight() {
-        //moves diagonal to the right
-        movement();
-        this.direction = gps.getRight(this.direction);
-
-        movement();
-        update(droneActions.heading(this.direction));
+        CardinalDirection newDir = gps.getRight(this.direction);
+        if (newDir != this.direction) {
+            this.direction = newDir;
+            update(droneActions.heading(newDir));
+        }
     }
 
     @Override
     public void turnLeft() {
-        //moves diagonal to the left 
-        movement();
-        this.direction = gps.getLeft(this.direction);
-        movement();
-        update(droneActions.heading(this.direction));
+        CardinalDirection newDir = gps.getLeft(this.direction);
+        if (newDir != this.direction) {
+            this.direction = newDir;
+            update(droneActions.heading(newDir));
+        }
     }
 
     @Override
@@ -71,10 +63,19 @@ public class MovementController extends ExplorerDrone implements Actions {
         update(droneActions.stop());
     }
 
-    public void comeHome() {
-        //logic to go home
+    @Override
+    public JSONObject scan() {
+        JSONObject scanCmd = droneActions.scan();
+        update(scanCmd);
+        return scanCmd;
     }
 
+    @Override
+    public JSONObject echo(CardinalDirection dir) {
+        JSONObject echoCmd = droneActions.echo(dir);
+        update(echoCmd);
+        return echoCmd;
+    }
 
     @Override
     public int getBatteryLevel() {
@@ -84,6 +85,11 @@ public class MovementController extends ExplorerDrone implements Actions {
     @Override
     public void useBattery(int batteryLevel) {
         battery.useBattery(batteryLevel);
+    }
+
+    @Override
+    public int getInitialBatteryLevel() {
+        return battery.getInitialBatteryLevel();
     }
 
     @Override
@@ -100,10 +106,4 @@ public class MovementController extends ExplorerDrone implements Actions {
     public CardinalDirection getDirection() {
         return direction;
     }
-
-    @Override
-    public int getInitialBatteryLevel() {
-        return this.battery.getInitialBatteryLevel();
-    }
-    
 }

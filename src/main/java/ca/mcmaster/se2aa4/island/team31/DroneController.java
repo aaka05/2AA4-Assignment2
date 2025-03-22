@@ -13,6 +13,7 @@ import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
+import ca.mcmaster.se2aa4.island.team31.Terrain.Decidable;
 import ca.mcmaster.se2aa4.island.team31.Terrain.FindIsland;
 import ca.mcmaster.se2aa4.island.team31.Terrain.State;
 
@@ -29,7 +30,6 @@ public class DroneController {
     private JSONObject previousCommand;
 
     public DroneController(int batteryLevel, String direction) {
-        // Set initial direction, defaulting to East if invalid
         Direction.CardinalDirection startDirection = Direction.CardinalDirection.E;
         try {
             startDirection = Direction.CardinalDirection.valueOf(direction);
@@ -37,27 +37,25 @@ public class DroneController {
             logger.error("Invalid direction provided, defaulting to East", e);
         }
 
-        // Initialize components
         this.battery = new Battery(batteryLevel);
         this.drone = new MovementController(batteryLevel, direction);
         this.sensor = new Sensor(startDirection);
         this.constraints = new Constraints(this.drone);
 
-        // Start in the FindIsland state
         this.currentState = new FindIsland(this.drone, this.sensor);
 
-        // Track drone actions
         List<ExplorerDrone> subjects = Arrays.asList(this.drone, this.sensor);
         this.droneTracker = new DroneTracker(subjects);
 
         logger.info("DroneController initialized with direction: {}", startDirection);
     }
+
     public int getBatteryLevel() {
-        return this.drone.getBatteryLevel();  // Ensure MovementController has this method
+        return this.drone.getBatteryLevel();
     }
-    
+
     public int getInitialBatteryLevel() {
-        return this.drone.getInitialBatteryLevel();  // Ensure MovementController has this method
+        return this.drone.getInitialBatteryLevel();
     }
 
     private void updateBatteryLevel() {
@@ -77,19 +75,29 @@ public class DroneController {
     public JSONObject takeDecision() {
         updateBatteryLevel();
 
-        // Stop if battery is insufficient
         if (!constraints.enoughBattery()) {
             return stopMoving();
+        }
+
+        if (currentState instanceof Decidable decidable) {
+            String decision = decidable.takeDecision();
+            if (decision != null) {
+                logger.info("Decision taken: {}", decision);
+                this.previousCommand = new JSONObject(decision);
+                return this.previousCommand;
+            } else {
+                logger.warn("Decidable.takeDecision() returned null.");
+                return null;
+            }
         }
 
         State nextState;
         State currentState;
 
-        // Keep transitioning states until no change occurs
         do {
-            currentState = this.currentState; // Store current state
+            currentState = this.currentState;
             nextState = this.currentState.getNextState(previousCommand);
-            this.currentState = nextState; // Update to next state
+            this.currentState = nextState;
         } while (!currentState.equals(nextState));
 
         return droneTracker.getRecentCommand();
@@ -97,5 +105,9 @@ public class DroneController {
 
     public void updateDrone(JSONObject command) {
         this.previousCommand = command;
+
+        if (currentState instanceof Decidable decidable) {
+            decidable.acknowledgeResults(command);
+        }
     }
 }

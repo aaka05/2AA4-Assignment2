@@ -1,8 +1,8 @@
 package ca.mcmaster.se2aa4.island.team31.Terrain;
 
 import org.json.JSONObject;
-
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
+import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
 public class FindIsland extends State {
@@ -21,23 +21,21 @@ public class FindIsland extends State {
 
     @Override
     public State getNextState(JSONObject command) {
-        //  Check if land was found and switch state
         if (landDetector.foundGround(command)) {
             int distance = landDetector.getDistance(command);
-            return new GoToIsland(drone, sensor, distance); //  Make sure GoToIsland exists
+            return new GoToIsland(drone, sensor, distance);
         }
 
-        //  Zig-zag movement pattern with echo
         if (echo) {
             sensor.echoForward();
             echo = false;
         } else if (turnRight) {
-            drone.turnRight();  // move diagonally down-right
+            drone.turnRight();
             turnRight = false;
             turnLeft = true;
             echo = true;
         } else if (turnLeft) {
-            drone.turnLeft();   // move diagonally down-left
+            drone.turnLeft();
             turnLeft = false;
             turnRight = true;
             echo = true;
