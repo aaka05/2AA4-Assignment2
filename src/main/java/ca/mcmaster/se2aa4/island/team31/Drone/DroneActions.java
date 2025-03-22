@@ -1,12 +1,13 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import ca.mcmaster.se2aa4.island.team31.DroneController;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
-import eu.ace_design.island.game.Directions;
 
 public class DroneActions {
+    private static final Logger logger = LogManager.getLogger(DroneActions.class);
 
     public JSONObject heading(Direction.CardinalDirection direction) {
         JSONObject decision = new JSONObject();
@@ -40,6 +41,7 @@ public class DroneActions {
     }
 
     public JSONObject scan() {
+        logger.info("Scanning from drone actions");
         JSONObject decision = new JSONObject();
         decision.put("action", "scan");
         return decision;

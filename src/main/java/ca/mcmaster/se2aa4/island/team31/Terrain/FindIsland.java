@@ -1,11 +1,15 @@
 package ca.mcmaster.se2aa4.island.team31.Terrain;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
 public class FindIsland extends State {
+
+    private static final Logger logger = LogManager.getLogger(FindIsland.class);
 
     private final LandDetector landDetector = new LandDetector();
     private boolean turnRight;
@@ -23,6 +27,7 @@ public class FindIsland extends State {
     public State getNextState(JSONObject command) {
         //  Check if land was found and switch state
         if (landDetector.foundGround(command)) {
+            logger.info("Found land, switching to GoToIsland state");
             int distance = landDetector.getDistance(command);
             return new GoToIsland(drone, sensor, distance); //  Make sure GoToIsland exists
         }
