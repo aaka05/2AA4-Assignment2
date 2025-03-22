@@ -26,8 +26,8 @@ public class Searcher extends State {
     @Override
     public State getNextState(JSONObject response) {
         if (shouldFly){
-            if (inOcean(response)){
-                return new BackToIsland(drone, sensor);
+            if (inOcean(response) && foundLand){
+                drone.stop();
             }
             else if(!inOcean(response) && !foundLand){
                 foundLand = true;
