@@ -24,6 +24,6 @@ public class GoToIsland extends State {
         }
 
         // Reached land after flying the correct number of steps
-        return new Searcher(drone, sensor);  // Or return new OnIsland(drone, sensor); if you'd like to enter a new state
+        return new OnIsland(drone, sensor);  // Or return new OnIsland(drone, sensor); if you'd like to enter a new state
     }
 }

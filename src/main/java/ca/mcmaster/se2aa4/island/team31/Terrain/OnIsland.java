@@ -49,7 +49,7 @@ public class OnIsland extends State {
             }
             else{
                 if(revisitedLocationsCount > (int)(0*6 * totalScannedSteps)){
-                    //return new RefindIsland(this.drone, this.sensor);
+                    return new ReFindIsland(this.drone, this.sensor);
                  }
                 return new MakeTurn(this.drone, this.sensor);
             }
@@ -93,7 +93,7 @@ public class OnIsland extends State {
             logger.info("Scanning");
 
             if(drone.isTurnPoint()){
-                //return new RefindIsland(this.drone, this.sensor);
+                return new ReFindIsland(this.drone, this.sensor);
             }
 
             if (drone.hasVisitedLocation()){
