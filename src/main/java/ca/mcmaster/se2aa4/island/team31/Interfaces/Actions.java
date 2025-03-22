@@ -32,5 +32,8 @@ public interface Actions {
 
     public void markAsTurnPoint();
 
+    public Direction.CardinalDirection getSearchHeading();
+
+
 }
 

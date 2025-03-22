@@ -10,19 +10,19 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 public class MakeTurn extends State {
     private LandDetector landDetector = new LandDetector();
 
+    
+    private boolean droneHasTurned;
+    private boolean checkLand;
     private boolean turnRight;
     private boolean turnLeft;
-    private boolean turnDone;
-    private boolean checkLand;
 
     public MakeTurn(Actions drone, Sensor sensor) {
         super(drone, sensor);
         
         // Initialize based on current heading
-        CardinalDirection heading = drone.getDirection();
-        turnRight = (heading == CardinalDirection.N || heading == CardinalDirection.E);
-        turnLeft = (heading == CardinalDirection.S || heading == CardinalDirection.W);
-        turnDone = false;
+        turnRight = false;
+        turnLeft = false;
+        droneHasTurned = false;
         checkLand = false;
     }
 
@@ -34,26 +34,49 @@ public class MakeTurn extends State {
                 return new BackToIsland(this.drone, this.sensor);
             }
         }
-        
-        if (turnDone) {
+        else if(droneHasTurned){
             checkLand = true;
             sensor.echoForward();
             return this;
         }
-        
-        if (turnRight) {
+        else if (turnRight) {
             drone.turnRight();
-            turnDone = true;
+            droneHasTurned = true;
             return this;
         }
-        
-        if (turnLeft) {
+        else if (turnLeft) {
             drone.turnLeft();
-            turnDone = true;
+            droneHasTurned = true;
             return this;
         }
 
-        // Should never reach here if state is properly initialized
-        throw new IllegalStateException("Invalid turn state reached");
+        else if(drone.getDirection() == CardinalDirection.S || drone.getDirection() == CardinalDirection.E){
+            if (drone.getSearchHeading() == CardinalDirection.N || drone.getSearchHeading() == CardinalDirection.E){
+                turnRight = true;
+                drone.turnRight();
+                return this;
+            }
+            else if (drone.getSearchHeading() == CardinalDirection.S || drone.getSearchHeading() == CardinalDirection.W){
+                turnLeft = true;
+                drone.turnLeft();
+                return this;
+            }
+        }
+        else if(drone.getDirection() == CardinalDirection.N || drone.getDirection() == CardinalDirection.W){
+            if (drone.getSearchHeading() == CardinalDirection.S || drone.getSearchHeading() == CardinalDirection.W){
+                turnRight = true;
+                drone.turnRight();
+                return this;
+            }
+            else if (drone.getSearchHeading() == CardinalDirection.N || drone.getSearchHeading() == CardinalDirection.E){
+                turnLeft = true;
+                drone.turnLeft();
+                return this;
+            }
+        }
+        else{
+            throw new IllegalStateException("Error: Invalid State/Direction");
+        }
+        return null;
     }
 }

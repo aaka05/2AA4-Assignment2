@@ -1,5 +1,7 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 import java.util.Set;
+import java.util.HashSet;
+
 
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
@@ -12,8 +14,11 @@ public class MovementController extends ExplorerDrone implements Actions {
     private Gps gps = new Gps();
     private Battery battery;
     private Direction.CardinalDirection direction;
+    private Direction.CardinalDirection searchHeading;
+    private Set<String> turningPoints;
     private int x;
     private int y;
+
     private int costPerAction;
     private Set<String> visitedLocations;
     private Set<String> turnPoints;
@@ -22,7 +27,8 @@ public class MovementController extends ExplorerDrone implements Actions {
     
     public MovementController(Integer batteryAmount, String startPosition) {
         this.battery = new Battery(batteryAmount);
-        this.costPerAction = costPerAction;
+        this.searchHeading = gps.getRight(direction);
+        this.turningPoints = new HashSet<>();
 
         x = 0;
         y= 0;
@@ -104,6 +110,11 @@ public class MovementController extends ExplorerDrone implements Actions {
         return this.battery.getInitialBatteryLevel();
     }
 
+    @Override
+    public Direction.CardinalDirection getSearchHeading() {
+        return this.searchHeading;
+    }
+
 
     @Override
     public boolean hasVisitedLocation() {
@@ -130,7 +141,5 @@ public class MovementController extends ExplorerDrone implements Actions {
         turnPoints.add(positionKey);
     }
 
-
-    
     
 }
