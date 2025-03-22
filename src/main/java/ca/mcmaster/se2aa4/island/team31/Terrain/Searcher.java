@@ -12,7 +12,13 @@ public class Searcher extends State {
 
     @Override
     public State getNextState(JSONObject response) {
-        // Implement logic for searching the island
+        if (response.has("extras") && response.getJSONObject("extras").has("found")) {
+            String foundType = response.getJSONObject("extras").getString("found");
+            if (foundType.equals("GROUND")) {
+                drone.stop(); // Triggers auto-return
+                return this;
+            }
+        }
         return this;
     }
 }
