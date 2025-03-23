@@ -14,105 +14,95 @@ public class OnIsland extends State {
 
     private final LandDetector landDetector;
 
+    // Control flags for drone behavior
     private boolean shouldScan;
     private boolean shouldFly;
     private boolean prevFoundLand;
-
     private boolean exitingIsland;
 
+    // Search tracking
     private Integer totalScannedSteps;
     private Integer revisitedLocationsCount;
 
-
     public OnIsland(Actions drone, Sensor sensor) {
         super(drone, sensor);
+        this.landDetector = new LandDetector();
+        
+        // Initialize control flags
         shouldScan = true;
         shouldFly = false;
         prevFoundLand = false;
-
         exitingIsland = false;
+
+        // Initialize counters
         totalScannedSteps = 0;
         revisitedLocationsCount = 0;
-        
-
-        this.landDetector = new LandDetector();
 
         logger.info("** In Search State");
-
-
     }
 
     @Override
     public State getNextState(JSONObject response) {
-
-        if(exitingIsland){
-            if (landDetector.foundGround(response)){
+        if (exitingIsland) {
+            if (landDetector.foundGround(response)) {
                 return new GoToIsland(this.drone, this.sensor, landDetector.getDistance(response));
-            }
-            else{
-                if(revisitedLocationsCount > (int)(0*6 * totalScannedSteps)){
+            } else {
+                if (revisitedLocationsCount > (int)(0.6 * totalScannedSteps)) {
                     return new ReFindIsland(this.drone, this.sensor);
-                 }
+                }
                 return new MakeTurn(this.drone, this.sensor);
             }
         }
 
-        if (shouldFly){
-            if (foundCreek(response)) {
-                logger.info("** Creek Found!");
-                String[] creeks = getCreeks(response);
-                // adding creeks to report
-                //for (String creek : creeks) {
-                   // addCreekToReport(creek);
-                //}
-            }
-
-            // checks if emergency site is found from previous scan
-            if (foundSite(response)) {
-                logger.info("** Emergency Site Found!");
-                String[] sites = getSites(response);
-                // adding site to report
-                //for (String site : sites) {
-                    //addSiteToReport(site);
-                //}
-            }
-
-            if (inOcean(response) && prevFoundLand){
+        if (shouldFly) {
+            handlePOIDetection(response);
+            
+            if (inOcean(response) && prevFoundLand) {
                 exitingIsland = true;
                 logger.info("**LEFT ISLAND");
-
                 sensor.echoForward();
                 return this;
-            }
-            else if(!inOcean(response) && !prevFoundLand){
+            } else if (!inOcean(response) && !prevFoundLand) {
                 prevFoundLand = true;
-            }
-            else{
+            } else {
                 drone.moveForward();
                 shouldFly = false;
                 shouldScan = true;
             }
-        } else if(shouldScan){
+        } else if (shouldScan) {
             totalScannedSteps++;
             logger.info("Scanning");
 
-            if(drone.isTurnPoint()){
+            if (drone.isTurnPoint()) {
                 return new ReFindIsland(this.drone, this.sensor);
             }
 
-            if (drone.hasVisitedLocation()){
+            if (drone.hasVisitedLocation()) {
                 revisitedLocationsCount++;
                 drone.moveForward();
                 prevFoundLand = true;
-            }else{
+            } else {
                 sensor.scan();
                 shouldFly = true;
                 shouldScan = false;
             }
         }
 
-
         return this;
+    }
+
+    private void handlePOIDetection(JSONObject response) {
+        if (foundCreek(response)) {
+            logger.info("** Creek Found!");
+            // String[] creeks = getCreeks(response);
+            // Creek handling can be added here if needed
+        }
+
+        if (foundSite(response)) {
+            logger.info("** Emergency Site Found!");
+            // String[] sites = getSites(response);
+            // Site handling can be added here if needed
+        }
     }
 
     private boolean inOcean(JSONObject response){
@@ -125,8 +115,6 @@ public class OnIsland extends State {
         JSONArray biomes = extras.optJSONArray("biomes");
         return biomes != null && biomes.length() == 1 && "OCEAN".equals(biomes.optString(0));
     }
-
-
 
     private boolean foundCreek(JSONObject response) {
         if (!response.has("extras")) return false;
@@ -154,7 +142,6 @@ public class OnIsland extends State {
         return false;
     }
 
-
     private String[] getCreeks(JSONObject response) {
         JSONObject extras = response.optJSONObject("extras");
         if (extras != null && extras.has("creeks")) {
@@ -180,8 +167,8 @@ public class OnIsland extends State {
         }
         return new String[0]; // return an empty array if no sites are found
     }
-
 }
+
 
 
 
