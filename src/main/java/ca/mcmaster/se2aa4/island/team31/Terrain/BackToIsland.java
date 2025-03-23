@@ -34,9 +34,10 @@ public class BackToIsland extends State {
     }
  
     /*
-     * After completing a grid search of the island in one direction, the drone will turn to prepare it to
-     * complete a grid search in the opposite direction, visiting and scanning the missed rows/columns
-     * to ensure a thorough search.
+     * After we finish searching in one direction, we need to turn the drone around
+     * to search the spots we missed. This helps us cover the whole island by going
+     * back and forth in a grid pattern. Kind of like mowing a lawn but in both
+     * directions to make sure we don't miss anything.
      */
     @Override
     public State getNextState(JSONObject response) {
@@ -56,23 +57,23 @@ public class BackToIsland extends State {
          */
  
         if (turnComplete) {
-            sensor.echoForward();  // Perform the echo after turning
+            sensor.echoForward();  // check what's in front of drone after turning
             finalCheck = true;
             return this;
         }
  
         if (goForward) {
-            drone.moveForward();  // Move forward to the next grid square
+            drone.moveForward();  // need to offset by one square to avoid old path
             goForward = false;
             return this;
         }
  
         if (goRight) {
-            drone.turnRight();  // Turn right to face the next quadrant
+            drone.turnRight();  // first part of the turn sequence
             turnComplete = true;
             return this;
         } else if (goLeft) {
-            drone.turnLeft();  // Turn left to face the next quadrant
+            drone.turnLeft();  // same thing but turning left instead
             turnComplete = true;
             return this;
         }
@@ -104,7 +105,7 @@ public class BackToIsland extends State {
             }
         }
  
-        return null;  // If no valid transition happens, stay in the current state
+        return null;  //if no valid transition happens, stay in the current state
     }
 }
  
