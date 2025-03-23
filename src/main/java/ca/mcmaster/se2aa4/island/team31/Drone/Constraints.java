@@ -35,7 +35,7 @@ public class Constraints {
         int currentBattery = droneController.getBatteryLevel();
         int initialBattery = droneController.getInitialBatteryLevel();
 
-        if (currentBattery < (initialBattery * 0.25)) {
+        if (currentBattery < (initialBattery * 0.007)) {
             logger.warn("Battery critically low! Returning to base.");
             return true;
         }

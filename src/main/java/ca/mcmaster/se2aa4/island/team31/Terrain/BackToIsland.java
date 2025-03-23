@@ -78,7 +78,7 @@ public class BackToIsland extends State {
         }
  
         // Decision making based on the current direction and search pattern
-        if (drone.getDirection() == Direction.CardinalDirection.S || drone.getDirection() == Direction.CardinalDirection.E) {
+        if (drone.getSearchHeading() == Direction.CardinalDirection.S || drone.getSearchHeading() == Direction.CardinalDirection.E) {
             if (drone.getDirection() == Direction.CardinalDirection.N || drone.getDirection() == Direction.CardinalDirection.E) { // LFR (Left, Forward, Right)
                 drone.turnLeft();
                 goForward = true;
@@ -90,7 +90,7 @@ public class BackToIsland extends State {
                 goLeft = true;
                 return this;
             }
-        } else if (drone.getDirection() == Direction.CardinalDirection.N || drone.getDirection() == Direction.CardinalDirection.W) {
+        } else if (drone.getSearchHeading() == Direction.CardinalDirection.N || drone.getSearchHeading() == Direction.CardinalDirection.W) {
             if (drone.getDirection() == Direction.CardinalDirection.S || drone.getDirection() == Direction.CardinalDirection.W) { // LFR (Left, Forward, Right)
                 drone.turnLeft();
                 goForward = true;
@@ -104,7 +104,7 @@ public class BackToIsland extends State {
             }
         }
  
-        return this;  // If no valid transition happens, stay in the current state
+        return null;  // If no valid transition happens, stay in the current state
     }
 }
  
