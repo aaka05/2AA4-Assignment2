@@ -12,7 +12,10 @@ public class BackToIsland extends State {
  
     private static final Logger logger = LogManager.getLogger(BackToIsland.class);
  
-    private LandDetector landDetector;  // Using LandDetector to check if ground is detected
+    //helper class to check if drone can see ground
+    private LandDetector landDetector;
+    
+    //flags to keep track of what drone needs to do next
     private boolean goForward;
     private boolean goLeft;
     private boolean goRight;
@@ -22,82 +25,104 @@ public class BackToIsland extends State {
     public BackToIsland(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
  
-        this.landDetector = new LandDetector();  // Initialize LandDetector
+        //create new detector to help drone find land
+        landDetector = new LandDetector();
  
+        //initialize all movement flags to false at the start
         goForward = false;
         goLeft = false;
         goRight = false;
         turnComplete = false;
         finalCheck = false;
  
-        logger.info("** In Back To Island State");
+        logger.info("Starting BackToIsland state - trying to get back to the island!");
     }
  
-    /*
-     * After we finish searching in one direction, we need to turn the drone around
-     * to search the spots we missed. This helps us cover the whole island by going
-     * back and forth in a grid pattern. Kind of like mowing a lawn but in both
-     * directions to make sure we don't miss anything.
+    /**
+     * This method figures out where the drone should go next.
+     * like mowing a lawn - you go in one direction,
+     * then turn around and go back the other way to cover the whole area.
+     * 
+     * Basic steps are:
+     * 1. Check if drone is done turning (finalCheck)
+     * 2. Execute turn
+     * 3. Figure out which way to turn based on drone's current direction
      */
+
     @Override
     public State getNextState(JSONObject response) {
+        //first, check if drone is done turning
         if (finalCheck) {
+            //see if we can spot any land
             if (landDetector.foundGround(response)) {
-                // If ground is found, move to the island
-                return new GoToIsland(this.drone, this.sensor, this.report, landDetector.getDistance(response));
+                //found land, heads towards it
+                return new GoToIsland(this.drone, this.sensor, this.report, 
+                                    landDetector.getDistance(response));
             }
-            // If ground is not found, re-locate the island
+            //flown off island, need to find it again
             return new ReFindIsland(this.drone, this.sensor, this.report);
         }
  
-        /*
-         * Turn Sequence:
-         * Turn towards the island, fly to offset from previous grid search,
-         * Turn again in opposite direction to slot into unvisited row/column
-         */
- 
+        //if drone finished turning, do one last check in front of it
         if (turnComplete) {
-            sensor.echoForward();  // check what's in front of drone after turning
+            sensor.echoForward(); 
             finalCheck = true;
             return this;
         }
  
+        //need to move forward one square to avoid where we've already been
         if (goForward) {
-            drone.moveForward();  // need to offset by one square to avoid old path
+            drone.moveForward();
             goForward = false;
             return this;
         }
  
+        //handle the actual turning part
         if (goRight) {
-            drone.turnRight();  // first part of the turn sequence
+            drone.turnRight();
             turnComplete = true;
             return this;
         } else if (goLeft) {
-            drone.turnLeft();  // same thing but turning left instead
+            drone.turnLeft();
             turnComplete = true;
             return this;
         }
  
-        // Decision making based on the current direction and search pattern
-        if (drone.getSearchHeading() == Direction.CardinalDirection.S || drone.getSearchHeading() == Direction.CardinalDirection.E) {
-            if (drone.getDirection() == Direction.CardinalDirection.N || drone.getDirection() == Direction.CardinalDirection.E) { // LFR (Left, Forward, Right)
+        //figure out which way to turn
+        //if drone is searching south or east:
+        if (drone.getSearchHeading() == Direction.CardinalDirection.S || 
+            drone.getSearchHeading() == Direction.CardinalDirection.E) {
+            
+            if (drone.getDirection() == Direction.CardinalDirection.N || 
+                drone.getDirection() == Direction.CardinalDirection.E) {
+                //do a left-forward-right turn
                 drone.turnLeft();
                 goForward = true;
                 goRight = true;
                 return this;
-            } else if (drone.getDirection() == Direction.CardinalDirection.S || drone.getDirection() == Direction.CardinalDirection.W) { // RFL (Right, Forward, Left)
+            } else if (drone.getDirection() == Direction.CardinalDirection.S || 
+                      drone.getDirection() == Direction.CardinalDirection.W) {
+                //do a right-forward-left turn
                 drone.turnRight();
                 goForward = true;
                 goLeft = true;
                 return this;
             }
-        } else if (drone.getSearchHeading() == Direction.CardinalDirection.N || drone.getSearchHeading() == Direction.CardinalDirection.W) {
-            if (drone.getDirection() == Direction.CardinalDirection.S || drone.getDirection() == Direction.CardinalDirection.W) { // LFR (Left, Forward, Right)
+        }
+        //if drone is searching north or west:
+        else if (drone.getSearchHeading() == Direction.CardinalDirection.N || 
+                 drone.getSearchHeading() == Direction.CardinalDirection.W) {
+            
+            if (drone.getDirection() == Direction.CardinalDirection.S || 
+                drone.getDirection() == Direction.CardinalDirection.W) {
+                //do a left-forward-right turn
                 drone.turnLeft();
                 goForward = true;
                 goRight = true;
                 return this;
-            } else if (drone.getDirection() == Direction.CardinalDirection.N || drone.getDirection() == Direction.CardinalDirection.E) { // RFL (Right, Forward, Left)
+            } else if (drone.getDirection() == Direction.CardinalDirection.N || 
+                      drone.getDirection() == Direction.CardinalDirection.E) {
+                //do a right-forward-left turn
                 drone.turnRight();
                 goForward = true;
                 goLeft = true;
@@ -105,7 +130,8 @@ public class BackToIsland extends State {
             }
         }
  
-        return null;  //if no valid transition happens, stay in the current state
+        //should never reach here - something went wrong
+        return null;
     }
 }
  

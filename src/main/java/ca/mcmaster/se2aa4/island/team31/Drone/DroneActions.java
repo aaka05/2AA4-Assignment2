@@ -6,44 +6,56 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 
+/**
+ * Handles all possible drone actions by creating appropriate JSON commands
+ */
 public class DroneActions {
-    private static final Logger logger = LogManager.getLogger(DroneActions.class);
+    private static final Logger log = LogManager.getLogger(DroneActions.class);
 
-    public JSONObject heading(Direction.CardinalDirection direction) {
-        JSONObject decision = new JSONObject();
-        JSONObject parameters = new JSONObject();
-        decision.put("action", "heading");
-        parameters.put("direction", direction);
-        decision.put("parameters", parameters);
-        return decision;
+    //creates a command to change drone's heading
+    public JSONObject heading(Direction.CardinalDirection dir) {
+        JSONObject cmd = new JSONObject();
+        JSONObject params = new JSONObject();
+        
+        cmd.put("action", "heading");
+        params.put("direction", dir);
+        cmd.put("parameters", params);
+        return cmd;
     }
 
+    //moves one tile forward
     public JSONObject fly() {
-        JSONObject decision = new JSONObject();
-        decision.put("action", "fly");
-        return decision;
+        JSONObject cmd = new JSONObject();
+        cmd.put("action", "fly");
+        return cmd;
     }
 
-    public JSONObject echo(Direction.CardinalDirection direction) {
-        JSONObject decision = new JSONObject();
-        JSONObject parameter = new JSONObject();
+    /**
+     * Sends out an echo in specified direction to detect obstacles
+     * Returns distance to nearest obstacle if one exists
+     */
+    public JSONObject echo(Direction.CardinalDirection dir) {
+        JSONObject cmd = new JSONObject();
+        JSONObject params = new JSONObject();
 
-        decision.put("action", "echo");
-        parameter.put("direction", direction);
-        decision.put("parameters", parameter);
-        return decision;
+        cmd.put("action", "echo");
+        params.put("direction", dir);
+        cmd.put("parameters", params);
+        return cmd;
     }
 
+    //stop and return to base
     public JSONObject stop() {
-        JSONObject decision = new JSONObject();
-        decision.put("action", "stop");
-        return decision;
+        JSONObject cmd = new JSONObject();
+        cmd.put("action", "stop");
+        return cmd;
     }
 
+    //scans current tile for biomes, POIs, etc
     public JSONObject scan() {
-        logger.info("Scanning from drone actions");
-        JSONObject decision = new JSONObject();
-        decision.put("action", "scan");
-        return decision;
+        log.info("Initiating area scan...");
+        JSONObject cmd = new JSONObject();
+        cmd.put("action", "scan");
+        return cmd;
     }
 } 

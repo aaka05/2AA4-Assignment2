@@ -1,145 +1,129 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
+
 import java.util.HashSet;
 import java.util.Set;
-
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 
-
+/**
+ * Main controller for drone movement and navigation
+ * handles position tracking, battery management, and movement commands
+ */
 public class MovementController extends ExplorerDrone implements Actions {
-
-    private Gps gps = new Gps();
-    private Sensor sensor;
-    private Battery battery;
-    private Direction.CardinalDirection direction;
-    private Direction.CardinalDirection searchHeading;
-    private Set<String> turningPoints;
-    private int x;
-    private int y;
-
-    private int costPerAction;
-    private Set<String> visitedLocations;
-    private Set<String> turnPoints;
-
-    private DroneActions droneActions = new DroneActions();
+    private final Gps gps;
+    private final Sensor sensor;
+    private final Battery battery;
+    private final DroneActions actions;
     
-    public MovementController(Integer batteryAmount, Direction.CardinalDirection startPosition, Sensor sensor) {
-        this.battery = new Battery(batteryAmount);
-        this.direction = startPosition;
-        this.sensor = sensor;
-        this.searchHeading = gps.getRight(this.direction);
-        this.turnPoints = new HashSet<>();
-        this.visitedLocations = new HashSet<>();
-        x = 0;
-        y= 0;
-        //Integer.parseInt(startPosition.split(",")[1]);
-        //Integer.parseInt(startPosition.split(",")[0]);
+    //position tracking
+    private int x, y;
+    private Direction.CardinalDirection heading;
+    private Direction.CardinalDirection searchHeading;
+    
+    //track visited locations and turn points for pathfinding
+    private final Set<String> visitedLocations;
+    private final Set<String> turnPoints;
 
+    public MovementController(Integer batteryCapacity, Direction.CardinalDirection startDir, Sensor sensor) {
+        this.gps = new Gps();
+        this.battery = new Battery(batteryCapacity);
+        this.heading = startDir;
+        this.sensor = sensor;
+        this.actions = new DroneActions();
+        
+        //initialize search direction (90° right of heading)
+        this.searchHeading = gps.getRight(this.heading);
+        
+        //start at origin (0,0)
+        this.x = 0;
+        this.y = 0;
+        
+        this.visitedLocations = new HashSet<>();
+        this.turnPoints = new HashSet<>();
     }
 
-    private void movement() {
-        int[] movement = gps.getForwardMovement(this.direction);
+    //updates position based on current heading
+    private void updatePosition() {
+        int[] movement = gps.getForwardMovement(this.heading);
         this.x += movement[0];
         this.y += movement[1];
     }
 
-
     @Override
     public void moveForward() {
-        movement();
-        update(droneActions.fly());
+        updatePosition();
+        update(actions.fly());
     }
 
+    //performs a right turn (diagonal movement)
     @Override
     public void turnRight() {
-        //moves diagonal to the right
-        movement();
-        this.searchHeading= this.direction;
-        this.direction = gps.getRight(this.direction);
-        this.sensor.setHeading(this.direction);
-
-        movement();
-
-        update(droneActions.heading(this.direction));
+        updatePosition();
+        this.searchHeading = this.heading;
+        this.heading = gps.getRight(this.heading);
+        this.sensor.setHeading(this.heading);
+        updatePosition();
+        update(actions.heading(this.heading));
     }
 
+    //performs a left turn (diagonal movement)
     @Override
     public void turnLeft() {
-        //moves diagonal to the left 
-        movement();
-        this.searchHeading= this.direction;
-        this.direction = gps.getLeft(this.direction);
-        this.sensor.setHeading(this.direction);
-        movement();
-        update(droneActions.heading(this.direction));
+        updatePosition();
+        this.searchHeading = this.heading;
+        this.heading = gps.getLeft(this.heading);
+        this.sensor.setHeading(this.heading);
+        updatePosition();
+        update(actions.heading(this.heading));
     }
 
     @Override
     public void stop() {
-        update(droneActions.stop());
+        update(actions.stop());
     }
 
+    //position and heading getters
     @Override
-    public int getBatteryLevel() {
-        return battery.getBatteryLevel();
-    }
-
+    public int getX() { return x; }
+    
     @Override
-    public void useBattery(int batteryLevel) {
-        battery.useBattery(batteryLevel);
-    }
-
+    public int getY() { return y; }
+    
     @Override
-    public int getX() {
-        return x;
-    }
-
+    public Direction.CardinalDirection getDirection() { return heading; }
+    
     @Override
-    public int getY() {
-        return y;
-    }
+    public Direction.CardinalDirection getSearchHeading() { return searchHeading; }
 
+    //battery management
     @Override
-    public Direction.CardinalDirection getDirection() {
-        return this.direction;
-    }
-
+    public int getCurrentCharge() { return battery.getCurrentCharge(); }
+    
     @Override
-    public int getInitialBatteryLevel() {
-        return this.battery.getInitialBatteryLevel();
-    }
-
+    public void useBattery(int amount) { battery.useBattery(amount); }
+    
     @Override
-    public Direction.CardinalDirection getSearchHeading() {
-        return this.searchHeading;
-    }
+    public int getMaxCapacity() { return battery.getMaxCapacity(); }
 
-
+    //location tracking methods
     @Override
     public boolean hasVisitedLocation() {
-        String positionKey = x + "," + y; // unique key for (x, y)
-        if (visitedLocations.contains(positionKey)) {
-            return true; // already visited this location
+        String pos = x + "," + y;
+        if (visitedLocations.contains(pos)) {
+            return true;
         }
-        visitedLocations.add(positionKey); // add new location to the set
+        visitedLocations.add(pos);
         return false;
     }
 
     @Override
     public boolean isTurnPoint() {
-        String positionKey = x + "," + y;
-        if (turnPoints.contains(positionKey)) {
-            return true; // current location is known to be a point to make a turn
-        }
-        return false;
+        return turnPoints.contains(x + "," + y);
     }
 
     @Override
     public void markAsTurnPoint() {
-        String positionKey = x + "," + y;
-        turnPoints.add(positionKey);
+        turnPoints.add(x + "," + y);
     }
-
-    
 }

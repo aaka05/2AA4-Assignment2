@@ -17,121 +17,119 @@ import ca.mcmaster.se2aa4.island.team31.Terrain.FindIsland;
 import ca.mcmaster.se2aa4.island.team31.Terrain.State;
 import ca.mcmaster.se2aa4.island.team31.Terrain.Report;
 
-
+/**
+ * main controller class for the exploration drone
+ * manages state transitions, battery levels, and exploration status
+ */
 public class DroneController {
 
-    private static final Logger logger = LogManager.getLogger(DroneController.class);
+    private static final Logger log = LogManager.getLogger(DroneController.class);
 
-    private DroneTracker droneTracker;
-    private MovementController drone;
-    private Sensor sensor;
-    private Report report;
-    private Battery battery;
-    private Constraints constraints;
+    private final DroneTracker tracker;
+    private final MovementController drone;
+    private final Sensor sensor;
+    private final Battery battery;
+    private final Constraints constraints;
+    private final Report report;
+
+    //state management
     private State currentState;
-    private JSONObject previousCommand;
-    private boolean isExplorationComplete;
-
+    private JSONObject lastCommand;
+    private boolean explorationDone;
 
     public DroneController(int batteryLevel, String direction) {
-        // Set initial direction, defaulting to East if invalid
-        Direction.CardinalDirection startDirection = Direction.CardinalDirection.E;
+        //set initial heading (default East if invalid)
+        Direction.CardinalDirection startDir = Direction.CardinalDirection.E;
         try {
-            startDirection = Direction.CardinalDirection.valueOf(direction);
+            startDir = Direction.CardinalDirection.valueOf(direction);
         } catch (Exception e) {
-            logger.error("Invalid direction provided, defaulting to East", e);
+            log.error("Bad direction input, defaulting to East", e);
         }
 
-        // Initialize components
+        //initialize drone components
         this.battery = new Battery(batteryLevel);
-        this.sensor = new Sensor(startDirection);
-        this.drone = new MovementController(batteryLevel, startDirection,this.sensor);
+        this.sensor = new Sensor(startDir);
+        this.drone = new MovementController(batteryLevel, startDir, this.sensor);
         this.constraints = new Constraints(this.drone);
         this.report = Report.getInstance();
 
-
-        // Start in the FindIsland state
+        //start with island search state (zigzag pattern)
         this.currentState = new FindIsland(this.drone, this.sensor, this.report);
 
-        // Track drone actions
-        List<ExplorerDrone> subjects = Arrays.asList(this.drone, this.sensor);
-        this.droneTracker = new DroneTracker(subjects);
-
-        isExplorationComplete = false;
-
-        logger.info("DroneController initialized with direction: {}", startDirection);
+        //setup action tracking
+        List<ExplorerDrone> components = Arrays.asList(this.drone, this.sensor);
+        this.tracker = new DroneTracker(components);
+        
+        this.explorationDone = false;
+        log.info("Drone initialized, heading " + startDir);
     }
-    public int getBatteryLevel() {
-        return this.drone.getBatteryLevel();  // Ensure MovementController has this method
+
+    //battery management
+    public int getCurrentCharge() {
+        return this.drone.getCurrentCharge();
     }
     
-    public int getInitialBatteryLevel() {
-        return this.drone.getInitialBatteryLevel();  // Ensure MovementController has this method
+    public int getMaxCapacity() {
+        return this.drone.getMaxCapacity();
     }
 
     private void updateBatteryLevel() {
-        if (previousCommand != null && previousCommand.has("cost")) {
-            int batteryUsed = previousCommand.getInt("cost");
-            this.drone.useBattery(batteryUsed);
-            logger.info("Battery updated: {} remaining", this.drone.getBatteryLevel());
+        if (lastCommand != null && lastCommand.has("cost")) {
+            int energyUsed = lastCommand.getInt("cost");
+            this.drone.useBattery(energyUsed);
+            log.info("Battery: {} remaining", this.drone.getCurrentCharge());
         }
     }
 
-    private JSONObject stopMoving() {
-        logger.info("Stopping drone due to low battery.");
+    //emergency stop if battery is critical (drone back to base)
+    private JSONObject emergencyStop() {
+        log.info("Emergency stop - battery critical");
         this.drone.stop();
-        return droneTracker.getRecentCommand();
+        return tracker.getRecentCommand();
     }
 
+    //main decision loop
     public JSONObject takeDecision() {
         updateBatteryLevel();
 
-        // Stop if battery is insufficient
-        if (!constraints.enoughBattery()) {
-            setExplorationIsComplete(true);
-            return stopMoving();
+        //check battery status
+        if (!constraints.canContinue()) {
+            setExplorationDone(true);
+            return emergencyStop();
         }
 
+        //process state transitions
         State nextState;
-        State currentState;
-
-        // Keep transitioning states until no change occurs
+        State current;
         do {
-            currentState = this.currentState; // Store current state
-            nextState = this.currentState.getNextState(this.previousCommand);
-            this.currentState = nextState; // Update to next state
-        } while (!currentState.equals(nextState));
+            current = this.currentState;
+            nextState = this.currentState.getNextState(this.lastCommand);
+            this.currentState = nextState;
+        } while (!current.equals(nextState));
 
-
-        JSONObject decision = droneTracker.getRecentCommand();
-        // checks if decision is to stop
-        setExplorationIsComplete(decision);
-
+        JSONObject decision = tracker.getRecentCommand();
+        checkForStopCommand(decision);
         return decision;
     }
 
     public void updateDrone(JSONObject command) {
-        this.previousCommand = command;
+        this.lastCommand = command;
     }
 
-
-    private void setExplorationIsComplete(JSONObject decision) {
+    private void checkForStopCommand(JSONObject decision) {
         if (decision.has("action") && "stop".equals(decision.getString("action"))) {
-            // The decision was to stop
-            logger.info("** Stopping exploration");
-            this.isExplorationComplete = true;
+            log.info("Exploration complete");
+            this.explorationDone = true;
         }
     }
-
     
-    private void setExplorationIsComplete(boolean decisionIsToStop) {
-        this.isExplorationComplete = decisionIsToStop;
+    private void setExplorationDone(boolean done) {
+        this.explorationDone = done;
     }
 
     public boolean isExplorationComplete() {
-        return this.isExplorationComplete;
+        return this.explorationDone;
     }
-
 
     public String getDiscoveries() {
         return this.report.presentDiscoveries();

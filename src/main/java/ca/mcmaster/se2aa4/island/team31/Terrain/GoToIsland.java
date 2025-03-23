@@ -1,4 +1,3 @@
-
 package ca.mcmaster.se2aa4.island.team31.Terrain;
 
 import org.json.JSONObject;
@@ -8,22 +7,23 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
 public class GoToIsland extends State {
 
-    int distanceRemaining;
+    //steps we still need to take to reach the island (reaches just one tile before island)
+    private int stepsRemaining;
 
     public GoToIsland(Actions drone, Sensor sensor, Report report, int distance) {
         super(drone, sensor, report);
-        this.distanceRemaining = distance;
+        this.stepsRemaining = distance;
     }
 
     @Override
     public State getNextState(JSONObject response) {
-        if (this.distanceRemaining > 0) {
-            distanceRemaining--;
+        if (this.stepsRemaining > 0) {
+            stepsRemaining--;
             drone.moveForward();
             return this;
         }
 
-        // Reached land after flying the correct number of steps
-        return new OnIsland(this.drone, this.sensor, this.report);  // Or return new OnIsland(drone, sensor); if you'd like to enter a new state
+        //we made it to the island - switch to on island state
+        return new OnIsland(this.drone, this.sensor, this.report);
     }
 }

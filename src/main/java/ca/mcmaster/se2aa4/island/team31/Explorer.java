@@ -34,8 +34,6 @@ public class Explorer implements IExplorerRaid {
 
         JSONObject command = droneController.takeDecision();
         logger.info("** Action done: {}", command.toString());
-        //droneController.updateDrone(command);
-
         return command.toString();
     }
 

@@ -9,46 +9,39 @@ import org.apache.logging.log4j.Logger;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 
 public class Constraints {
+    private static final double LOW_BATTERY_THRESHOLD = 0.007;
+    private final MovementController drone;
+    private final Logger log;
+    private final Map<CardinalDirection, CardinalDirection> illegalTurns;
 
-    private final MovementController droneController;
-    private final Logger logger = LogManager.getLogger();
-    private final Map<CardinalDirection, CardinalDirection> restrictedTurns;
-
-    public Constraints(MovementController droneController) {
-        this.droneController = droneController;
-
-        // Define invalid 180-degree turns
-        this.restrictedTurns = new EnumMap<>(CardinalDirection.class);
-        this.restrictedTurns.put(CardinalDirection.N, CardinalDirection.S);
-        this.restrictedTurns.put(CardinalDirection.S, CardinalDirection.N);
-        this.restrictedTurns.put(CardinalDirection.E, CardinalDirection.W);
-        this.restrictedTurns.put(CardinalDirection.W, CardinalDirection.E);
+    public Constraints(MovementController drone) {
+        this.drone = drone;
+        this.log = LogManager.getLogger();
+        
+        //map out illegal 180° turns
+        illegalTurns = new EnumMap<>(CardinalDirection.class);
+        illegalTurns.put(CardinalDirection.N, CardinalDirection.S);
+        illegalTurns.put(CardinalDirection.S, CardinalDirection.N);
+        illegalTurns.put(CardinalDirection.E, CardinalDirection.W);
+        illegalTurns.put(CardinalDirection.W, CardinalDirection.E);
     }
 
-    // Check if the move is an invalid U-turn
-    public boolean isInvalidUTurn(CardinalDirection currentHeading, CardinalDirection newHeading) {
-        return restrictedTurns.get(currentHeading) == newHeading;
+    public boolean isBadTurn(CardinalDirection current, CardinalDirection next) {
+        return illegalTurns.get(current) == next;
     }
 
-    // Check if the drone should return home due to low battery
-    public boolean shouldReturnHome() {
-        int currentBattery = droneController.getBatteryLevel();
-        int initialBattery = droneController.getInitialBatteryLevel();
-
-        if (currentBattery < (initialBattery * 0.007)) {
-            logger.warn("Battery critically low! Returning to base.");
+    //checks if drone needs to return to base
+    public boolean needsRecharge() {
+        if (drone.getCurrentCharge() < (drone.getMaxCapacity() * LOW_BATTERY_THRESHOLD)) {
+            log.warn("Low battery - returning to charging station");
             return true;
         }
         return false;
     }
 
-    // Check if there's enough battery to continue
-    public boolean enoughBattery() {
-        // If we should return home, we don't have enough battery to continue exploring
-        if (shouldReturnHome()) {
-            return false;
-        }
-        // Keep the minimum battery check as an additional safeguard
-        return droneController.getBatteryLevel() >= (droneController.getInitialBatteryLevel() * 0.007);
+    //checks if drone can continue exploring
+    public boolean canContinue() {
+        return !needsRecharge() && 
+               drone.getCurrentCharge() >= (drone.getMaxCapacity() * LOW_BATTERY_THRESHOLD);
     }
 }

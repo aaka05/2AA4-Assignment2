@@ -1,35 +1,37 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 
 public class Battery {
-    private final int initialBatteryLevel; // ✅ New field
-    private int batteryLevel;
+    private final int maxCapacity;
+    private int currentCharge;
 
-    public Battery(int initialBatteryLevel) {
-        if (initialBatteryLevel < 0) {
-            throw new IllegalArgumentException("Battery level cannot be negative");
+    public Battery(int capacity) {
+        if (capacity < 0) {
+            throw new IllegalArgumentException("Battery capacity must be positive");
         }
-        this.initialBatteryLevel = initialBatteryLevel; // ✅ Save the original value
-        this.batteryLevel = initialBatteryLevel;
+        this.maxCapacity = capacity;
+        this.currentCharge = capacity;
     }
 
-    public int useBattery(int amount) {
-        if (amount > this.batteryLevel) {
-            throw new IllegalArgumentException("Battery level cannot be negative");
+    public int useBattery(int energyRequired) {
+        if (energyRequired > this.currentCharge) {
+            throw new IllegalArgumentException("Not enough battery charge remaining");
         }
-        this.batteryLevel -= amount;
-        return this.batteryLevel;
+        this.currentCharge -= energyRequired;
+        return this.currentCharge;
     }
 
-    public int getInitialBatteryLevel() {
-        return initialBatteryLevel; // ✅ Now returns the true initial battery
+    //returns initial/max battery capacity
+    public int getMaxCapacity() {
+        return maxCapacity;
     }
 
-    public int getBatteryLevel() {
-        return batteryLevel;
+    public int getCurrentCharge() {
+        return currentCharge;
     }
 
-    public boolean goHome(int x, int y, int costPerMove) {
-        int costToGoHome = (x + y) * costPerMove;
-        return batteryLevel <= costToGoHome;
+    //checks if drone should return to base
+    public boolean goHome(int xPos, int yPos, int energyPerMove) {
+        int energyNeededForReturn = (xPos + yPos) * energyPerMove;
+        return currentCharge <= energyNeededForReturn;
     }
 }

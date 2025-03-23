@@ -4,28 +4,29 @@ import org.json.JSONObject;
 
 public class LandDetector {
 
-    //this function checks if we hit the ground or not
-    public boolean foundGround(JSONObject response) {
-        if (response == null || !response.has("extras")) {
-            return false;
+    // Helper method to safely get the extras object
+    private JSONObject getExtras(JSONObject response) {
+        if (response != null && response.has("extras")) {
+            return response.getJSONObject("extras");
         }
-        JSONObject extras = response.getJSONObject("extras");
-        if (extras.has("found")) {
-            String found = extras.getString("found");
-            return "GROUND".equals(found);  // checks if "found" is "GROUND"
+        return null;
+    }
+
+    //checks if the drone's sensor detected ground
+    public boolean foundGround(JSONObject response) {
+        JSONObject extras = getExtras(response);
+        if (extras != null && extras.has("found")) {
+            return "GROUND".equals(extras.getString("found"));
         }
         return false;
     }
 
-    //gives back how far away we are from the ground
+    //returns how many steps away the ground is
     public int getDistance(JSONObject response) {
-        int range = 0;
-        if (response != null && response.has("extras")) {
-            JSONObject extras = response.getJSONObject("extras");
-            if (extras.has("range")) {
-                range = extras.getInt("range");
-            }
+        JSONObject extras = getExtras(response);
+        if (extras != null && extras.has("range")) {
+            return extras.getInt("range");
         }
-        return range;
+        return 0;
     }
 }

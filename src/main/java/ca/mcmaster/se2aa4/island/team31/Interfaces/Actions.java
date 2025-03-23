@@ -14,11 +14,11 @@ public interface Actions {
 
     public void stop();
 
-    public int getBatteryLevel();
+    public int getCurrentCharge();
 
     public void useBattery(int batteryLevel);
 
-    public int getInitialBatteryLevel();
+    public int getMaxCapacity();
 
     public int getX();
 
