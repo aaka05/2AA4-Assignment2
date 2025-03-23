@@ -37,6 +37,8 @@ public class OnIsland extends State {
 
         this.landDetector = new LandDetector();
 
+        logger.info("** In Search State");
+
 
     }
 
@@ -77,6 +79,8 @@ public class OnIsland extends State {
 
             if (inOcean(response) && prevFoundLand){
                 exitingIsland = true;
+                logger.info("**LEFT ISLAND");
+
                 sensor.echoForward();
                 return this;
             }
@@ -100,9 +104,10 @@ public class OnIsland extends State {
                 revisitedLocationsCount++;
                 drone.moveForward();
                 prevFoundLand = true;
-            }else{sensor.scan();
-            shouldFly = true;
-            shouldScan = false;
+            }else{
+                sensor.scan();
+                shouldFly = true;
+                shouldScan = false;
             }
         }
 

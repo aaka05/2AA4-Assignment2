@@ -39,8 +39,8 @@ public class DroneController {
 
         // Initialize components
         this.battery = new Battery(batteryLevel);
-        this.drone = new MovementController(batteryLevel, direction);
         this.sensor = new Sensor(startDirection);
+        this.drone = new MovementController(batteryLevel, startDirection,this.sensor);
         this.constraints = new Constraints(this.drone);
 
         // Start in the FindIsland state

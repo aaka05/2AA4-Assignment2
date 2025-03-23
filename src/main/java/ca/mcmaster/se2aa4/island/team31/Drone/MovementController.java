@@ -3,7 +3,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 
@@ -11,6 +10,7 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 public class MovementController extends ExplorerDrone implements Actions {
 
     private Gps gps = new Gps();
+    private Sensor sensor;
     private Battery battery;
     private Direction.CardinalDirection direction;
     private Direction.CardinalDirection searchHeading;
@@ -24,21 +24,17 @@ public class MovementController extends ExplorerDrone implements Actions {
 
     private DroneActions droneActions = new DroneActions();
     
-    public MovementController(Integer batteryAmount, String startPosition) {
+    public MovementController(Integer batteryAmount, Direction.CardinalDirection startPosition, Sensor sensor) {
         this.battery = new Battery(batteryAmount);
-        this.searchHeading = gps.getRight(direction);
+        this.direction = startPosition;
+        this.sensor = sensor;
+        this.searchHeading = gps.getRight(this.direction);
         this.turnPoints = new HashSet<>();
         this.visitedLocations = new HashSet<>();
         x = 0;
         y= 0;
         //Integer.parseInt(startPosition.split(",")[1]);
         //Integer.parseInt(startPosition.split(",")[0]);
-
-        try{
-            this.direction = CardinalDirection.valueOf(startPosition);
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
 
     }
 
@@ -59,9 +55,12 @@ public class MovementController extends ExplorerDrone implements Actions {
     public void turnRight() {
         //moves diagonal to the right
         movement();
+        this.searchHeading= this.direction;
         this.direction = gps.getRight(this.direction);
+        this.sensor.setHeading(this.direction);
 
         movement();
+
         update(droneActions.heading(this.direction));
     }
 
@@ -69,7 +68,9 @@ public class MovementController extends ExplorerDrone implements Actions {
     public void turnLeft() {
         //moves diagonal to the left 
         movement();
+        this.searchHeading= this.direction;
         this.direction = gps.getLeft(this.direction);
+        this.sensor.setHeading(this.direction);
         movement();
         update(droneActions.heading(this.direction));
     }
@@ -100,8 +101,8 @@ public class MovementController extends ExplorerDrone implements Actions {
     }
 
     @Override
-    public CardinalDirection getDirection() {
-        return direction;
+    public Direction.CardinalDirection getDirection() {
+        return this.direction;
     }
 
     @Override
