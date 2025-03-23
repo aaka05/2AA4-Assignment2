@@ -5,6 +5,13 @@ import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
+/**
+ * States can include:
+ * - Finding the island
+ * - Exploring the island
+ * - Re-finding the island
+ * - Making turns
+ */
 public abstract class State {
     protected final Actions drone;
     protected final Sensor sensor;
