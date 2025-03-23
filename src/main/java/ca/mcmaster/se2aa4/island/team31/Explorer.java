@@ -54,11 +54,16 @@ public class Explorer implements IExplorerRaid {
         logger.info("Additional information received: {}", extraInfo);
 
         droneController.updateDrone(response);
+        if (this.droneController.isExplorationComplete()) {
+            String results = deliverFinalReport();
+            logger.info(results);
+        }
+
     }
 
     @Override
     public String deliverFinalReport() {
-        return "no creek found";
+        return droneController.getDiscoveries();
     }
 
 }

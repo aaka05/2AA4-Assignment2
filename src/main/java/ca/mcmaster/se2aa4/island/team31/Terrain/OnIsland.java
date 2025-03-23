@@ -24,8 +24,8 @@ public class OnIsland extends State {
     private Integer totalScannedSteps;
     private Integer revisitedLocationsCount;
 
-    public OnIsland(Actions drone, Sensor sensor) {
-        super(drone, sensor);
+    public OnIsland(Actions drone, Sensor sensor, Report report) {
+        super(drone, sensor, report);
         this.landDetector = new LandDetector();
         
         // Initialize control flags
@@ -45,12 +45,12 @@ public class OnIsland extends State {
     public State getNextState(JSONObject response) {
         if (exitingIsland) {
             if (landDetector.foundGround(response)) {
-                return new GoToIsland(this.drone, this.sensor, landDetector.getDistance(response));
+                return new GoToIsland(this.drone, this.sensor, this.report, landDetector.getDistance(response));
             } else {
                 if (revisitedLocationsCount > (int)(0.6 * totalScannedSteps)) {
-                    return new ReFindIsland(this.drone, this.sensor);
+                    return new ReFindIsland(this.drone, this.sensor, this.report);
                 }
-                return new MakeTurn(this.drone, this.sensor);
+                return new MakeTurn(this.drone, this.sensor, this.report);
             }
         }
 
@@ -74,7 +74,7 @@ public class OnIsland extends State {
             logger.info("Scanning");
 
             if (drone.isTurnPoint()) {
-                return new ReFindIsland(this.drone, this.sensor);
+                return new ReFindIsland(this.drone, this.sensor, this.report);
             }
 
             if (drone.hasVisitedLocation()) {
@@ -94,14 +94,18 @@ public class OnIsland extends State {
     private void handlePOIDetection(JSONObject response) {
         if (foundCreek(response)) {
             logger.info("** Creek Found!");
-            // String[] creeks = getCreeks(response);
-            // Creek handling can be added here if needed
+            String[] creeks = getCreeks(response);
+            for (String creek : creeks) {
+                addCreekToReport(creek);
+            }
         }
 
         if (foundSite(response)) {
             logger.info("** Emergency Site Found!");
-            // String[] sites = getSites(response);
-            // Site handling can be added here if needed
+            String[] sites = getSites(response);
+            for (String site : sites) {
+                addSiteToReport(site);
+            }       
         }
     }
 
@@ -167,7 +171,22 @@ public class OnIsland extends State {
         }
         return new String[0]; // return an empty array if no sites are found
     }
+
+
+    public void addCreekToReport(String creekId) {
+        int x = this.drone.getX();
+        int y = this.drone.getY();
+        this.report.addCreek(creekId, x, y);
+    }
+
+    public void addSiteToReport(String siteId) {
+        int x = this.drone.getX();
+        int y = this.drone.getY();
+        this.report.addSite(siteId, x, y);
+    }  
 }
+
+
 
 
 

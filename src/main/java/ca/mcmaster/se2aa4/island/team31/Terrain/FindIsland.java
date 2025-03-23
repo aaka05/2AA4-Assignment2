@@ -16,8 +16,8 @@ public class FindIsland extends State {
     private boolean turnLeft;
     private boolean echo;
 
-    public FindIsland(Actions drone, Sensor sensor) {
-        super(drone, sensor);
+    public FindIsland(Actions drone, Sensor sensor, Report report) {
+        super(drone, sensor, report);
         this.turnRight = true;
         this.turnLeft = false;
         this.echo = false;
@@ -29,7 +29,7 @@ public class FindIsland extends State {
         if (landDetector.foundGround(command)) {
             logger.info("Found land, switching to GoToIsland state");
             int distance = landDetector.getDistance(command);
-            return new GoToIsland(drone, sensor, distance); //  Make sure GoToIsland exists
+            return new GoToIsland(this.drone, this.sensor, this.report, distance); //  Make sure GoToIsland exists
         }
 
         //  Zig-zag movement pattern with echo

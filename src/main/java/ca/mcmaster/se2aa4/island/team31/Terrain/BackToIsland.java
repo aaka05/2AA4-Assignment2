@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
  
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
-import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
+import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  
 public class BackToIsland extends State {
  
@@ -19,8 +19,8 @@ public class BackToIsland extends State {
     private boolean turnComplete;
     private boolean finalCheck;
    
-    public BackToIsland(Actions drone, Sensor sensor) {
-        super(drone, sensor);
+    public BackToIsland(Actions drone, Sensor sensor, Report report) {
+        super(drone, sensor, report);
  
         this.landDetector = new LandDetector();  // Initialize LandDetector
  
@@ -44,10 +44,10 @@ public class BackToIsland extends State {
         if (finalCheck) {
             if (landDetector.foundGround(response)) {
                 // If ground is found, move to the island
-                return new GoToIsland(this.drone, this.sensor, landDetector.getDistance(response));
+                return new GoToIsland(this.drone, this.sensor, this.report, landDetector.getDistance(response));
             }
             // If ground is not found, re-locate the island
-            return new ReFindIsland(this.drone, this.sensor);
+            return new ReFindIsland(this.drone, this.sensor, this.report);
         }
  
         /*

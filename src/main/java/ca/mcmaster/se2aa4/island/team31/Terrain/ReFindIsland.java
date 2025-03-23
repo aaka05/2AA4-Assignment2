@@ -1,13 +1,12 @@
 package ca.mcmaster.se2aa4.island.team31.Terrain;
  
  
-import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
- 
- 
-import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
+import org.json.JSONObject;
+
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
+import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  
  
 public class ReFindIsland extends State {
@@ -24,8 +23,8 @@ public class ReFindIsland extends State {
     private boolean turnComplete;
     private boolean finalCheck;
    
-    public ReFindIsland(Actions drone, Sensor sensor) {
-        super(drone, sensor);
+    public ReFindIsland(Actions drone, Sensor sensor, Report report) {
+        super(drone, sensor, report);
         this.landDetector = new LandDetector();
        
         echoRight = true;
@@ -44,10 +43,10 @@ public class ReFindIsland extends State {
     public State getNextState(JSONObject response) {
         if (finalCheck) { // if ground found then go to it
             if (landDetector.foundGround(response)) {
-                return new GoToIsland(this.drone, this.sensor, landDetector.getDistance(response));
+                return new GoToIsland(this.drone, this.sensor, this.report, landDetector.getDistance(response));
             }
             // otherwise repeat process in new orientation
-            return new ReFindIsland(this.drone, this.sensor);
+            return new ReFindIsland(this.drone, this.sensor, this.report);
         }
  
  

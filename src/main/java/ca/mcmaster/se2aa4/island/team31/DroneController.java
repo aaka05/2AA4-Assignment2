@@ -15,6 +15,8 @@ import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 import ca.mcmaster.se2aa4.island.team31.Terrain.FindIsland;
 import ca.mcmaster.se2aa4.island.team31.Terrain.State;
+import ca.mcmaster.se2aa4.island.team31.Terrain.Report;
+
 
 public class DroneController {
 
@@ -23,10 +25,13 @@ public class DroneController {
     private DroneTracker droneTracker;
     private MovementController drone;
     private Sensor sensor;
+    private Report report;
     private Battery battery;
     private Constraints constraints;
     private State currentState;
     private JSONObject previousCommand;
+    private boolean isExplorationComplete;
+
 
     public DroneController(int batteryLevel, String direction) {
         // Set initial direction, defaulting to East if invalid
@@ -42,13 +47,17 @@ public class DroneController {
         this.sensor = new Sensor(startDirection);
         this.drone = new MovementController(batteryLevel, startDirection,this.sensor);
         this.constraints = new Constraints(this.drone);
+        this.report = Report.getInstance();
+
 
         // Start in the FindIsland state
-        this.currentState = new FindIsland(this.drone, this.sensor);
+        this.currentState = new FindIsland(this.drone, this.sensor, this.report);
 
         // Track drone actions
         List<ExplorerDrone> subjects = Arrays.asList(this.drone, this.sensor);
         this.droneTracker = new DroneTracker(subjects);
+
+        isExplorationComplete = false;
 
         logger.info("DroneController initialized with direction: {}", startDirection);
     }
@@ -79,6 +88,7 @@ public class DroneController {
 
         // Stop if battery is insufficient
         if (!constraints.enoughBattery()) {
+            setExplorationIsComplete(true);
             return stopMoving();
         }
 
@@ -88,14 +98,44 @@ public class DroneController {
         // Keep transitioning states until no change occurs
         do {
             currentState = this.currentState; // Store current state
-            nextState = this.currentState.getNextState(previousCommand);
+            nextState = this.currentState.getNextState(this.previousCommand);
             this.currentState = nextState; // Update to next state
         } while (!currentState.equals(nextState));
 
-        return droneTracker.getRecentCommand();
+
+        JSONObject decision = droneTracker.getRecentCommand();
+        // checks if decision is to stop
+        setExplorationIsComplete(decision);
+
+        return decision;
     }
 
     public void updateDrone(JSONObject command) {
         this.previousCommand = command;
     }
+
+
+    private void setExplorationIsComplete(JSONObject decision) {
+        if (decision.has("action") && "stop".equals(decision.getString("action"))) {
+            // The decision was to stop
+            logger.info("** Stopping exploration");
+            this.isExplorationComplete = true;
+        }
+    }
+
+    
+    private void setExplorationIsComplete(boolean decisionIsToStop) {
+        this.isExplorationComplete = decisionIsToStop;
+    }
+
+    public boolean isExplorationComplete() {
+        return this.isExplorationComplete;
+    }
+
+
+    public String getDiscoveries() {
+        return this.report.presentDiscoveries();
+    }
+
 }
+

@@ -10,20 +10,20 @@ public class GoToIsland extends State {
 
     int distanceRemaining;
 
-    public GoToIsland(Actions drone, Sensor sensor, int distance) {
-        super(drone, sensor);
+    public GoToIsland(Actions drone, Sensor sensor, Report report, int distance) {
+        super(drone, sensor, report);
         this.distanceRemaining = distance;
     }
 
     @Override
     public State getNextState(JSONObject response) {
         if (this.distanceRemaining > 0) {
-            drone.moveForward();
             distanceRemaining--;
+            drone.moveForward();
             return this;
         }
 
         // Reached land after flying the correct number of steps
-        return new OnIsland(drone, sensor);  // Or return new OnIsland(drone, sensor); if you'd like to enter a new state
+        return new OnIsland(this.drone, this.sensor, this.report);  // Or return new OnIsland(drone, sensor); if you'd like to enter a new state
     }
 }

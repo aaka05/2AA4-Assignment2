@@ -19,8 +19,8 @@ public class MakeTurn extends State {
     private boolean turnRight;
     private boolean turnLeft;
 
-    public MakeTurn(Actions drone, Sensor sensor) {
-        super(drone, sensor);
+    public MakeTurn(Actions drone, Sensor sensor, Report report) {
+        super(drone, sensor, report);
         
         // Initialize based on current heading
         turnRight = false;
@@ -36,9 +36,9 @@ public class MakeTurn extends State {
     public State getNextState(JSONObject response) {
         if (checkLand) {
             if (landDetector.foundGround(response)) {
-                return new GoToIsland(this.drone, this.sensor, landDetector.getDistance(response));
+                return new GoToIsland(this.drone, this.sensor, this.report, landDetector.getDistance(response));
             } else {
-                return new BackToIsland(this.drone, this.sensor);
+                return new BackToIsland(this.drone, this.sensor, this.report);
             }
         }
         else if(droneHasTurned){
