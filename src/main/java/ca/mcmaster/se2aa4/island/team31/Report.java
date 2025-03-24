@@ -1,4 +1,4 @@
-package ca.mcmaster.se2aa4.island.team31.Terrain;
+package ca.mcmaster.se2aa4.island.team31;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

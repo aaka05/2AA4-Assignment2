@@ -9,10 +9,7 @@ import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.DroneCommander;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 
-/**
- *Tracks and manages drone commands using a stack structure
- *acts as an observer for drone components to record their actions
- */
+//acts as an observer for drone components to record their actions
 public class DroneTracker implements DroneCommander {
     //stack of commands executed by the drone
     private final Deque<JSONObject> commandHistory;

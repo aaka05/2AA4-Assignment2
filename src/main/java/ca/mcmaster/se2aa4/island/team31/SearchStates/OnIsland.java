@@ -1,10 +1,13 @@
-package ca.mcmaster.se2aa4.island.team31.Terrain;
+package ca.mcmaster.se2aa4.island.team31.SearchStates;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import ca.mcmaster.se2aa4.island.team31.Report;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 

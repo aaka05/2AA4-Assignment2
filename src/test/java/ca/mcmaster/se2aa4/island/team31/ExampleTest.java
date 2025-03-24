@@ -12,16 +12,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
-import ca.mcmaster.se2aa4.island.team31.Terrain.FindIsland;
-import ca.mcmaster.se2aa4.island.team31.Terrain.GoToIsland;
-import ca.mcmaster.se2aa4.island.team31.Terrain.LandDetector;
-import ca.mcmaster.se2aa4.island.team31.Terrain.OnIsland;
-import ca.mcmaster.se2aa4.island.team31.Terrain.ReFindIsland;
-import ca.mcmaster.se2aa4.island.team31.Terrain.Report;
-import ca.mcmaster.se2aa4.island.team31.Terrain.State;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.FindIsland;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.GoToIsland;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.OnIsland;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.ReFindIsland;
+
 import static eu.ace_design.island.runner.Runner.run;
 public class ExampleTest {
 
