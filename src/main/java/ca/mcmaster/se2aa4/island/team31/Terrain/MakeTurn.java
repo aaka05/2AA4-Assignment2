@@ -4,8 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+import ca.mcmaster.se2aa4.island.team31.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
 public class MakeTurn extends State {

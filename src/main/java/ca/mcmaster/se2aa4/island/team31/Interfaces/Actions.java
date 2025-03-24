@@ -1,7 +1,7 @@
 package ca.mcmaster.se2aa4.island.team31.Interfaces;
 
 
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
+import ca.mcmaster.se2aa4.island.team31.Direction;
 
 
 public interface Actions {

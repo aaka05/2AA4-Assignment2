@@ -3,9 +3,9 @@ package ca.mcmaster.se2aa4.island.team31.Terrain;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
- 
+
+import ca.mcmaster.se2aa4.island.team31.Direction;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  
 public class BackToIsland extends State {

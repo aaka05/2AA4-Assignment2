@@ -2,7 +2,8 @@ package ca.mcmaster.se2aa4.island.team31.Drone;
 
 import java.util.HashSet;
 import java.util.Set;
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
+
+import ca.mcmaster.se2aa4.island.team31.Direction;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 

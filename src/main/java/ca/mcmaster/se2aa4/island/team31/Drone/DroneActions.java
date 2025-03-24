@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
+import ca.mcmaster.se2aa4.island.team31.Direction;
 
 /**
  * Handles all possible drone actions by creating appropriate JSON commands

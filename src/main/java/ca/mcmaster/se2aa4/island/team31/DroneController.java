@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Terrain.FindIsland;
 import ca.mcmaster.se2aa4.island.team31.Terrain.Report;
 import ca.mcmaster.se2aa4.island.team31.Terrain.State;

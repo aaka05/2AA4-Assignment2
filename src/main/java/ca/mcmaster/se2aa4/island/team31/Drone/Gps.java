@@ -2,7 +2,8 @@ package ca.mcmaster.se2aa4.island.team31.Drone;
 
 import java.util.EnumMap;
 import java.util.Map;
-import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
+
+import ca.mcmaster.se2aa4.island.team31.Direction.CardinalDirection;
 
 
  //navigation system for the drone
