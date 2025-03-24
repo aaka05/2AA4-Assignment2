@@ -3,11 +3,11 @@ package ca.mcmaster.se2aa4.island.team31.SearchStates;
 import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
-public class GoToIsland extends State {
+public class GoToIsland extends SearchStates {
 
     //steps we still need to take to reach the island (reaches just one tile before island)
     private int stepsRemaining;
@@ -18,7 +18,7 @@ public class GoToIsland extends State {
     }
 
     @Override
-    public State getNextState(JSONObject response) {
+    public SearchStates getNextSearch(JSONObject response) {
         if (this.stepsRemaining > 0) {
             stepsRemaining--;
             drone.moveForward();

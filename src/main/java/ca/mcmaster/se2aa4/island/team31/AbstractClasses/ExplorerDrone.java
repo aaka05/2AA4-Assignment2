@@ -1,6 +1,8 @@
-package ca.mcmaster.se2aa4.island.team31.Interfaces;
+package ca.mcmaster.se2aa4.island.team31.AbstractClasses;
 
 import org.json.JSONObject;
+
+import ca.mcmaster.se2aa4.island.team31.Interfaces.DroneCommander;
 
 
 public abstract class ExplorerDrone {

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
@@ -154,7 +154,7 @@ public class ExampleTest {
         FindIsland state = new FindIsland(drone, sensor, report);
         JSONObject response = new JSONObject()
                 .put("extras", new JSONObject().put("found", "GROUND").put("range", 2));
-        State next = state.getNextState(response);
+        SearchStates next = state.getNextSearch(response);
         assertTrue(next instanceof GoToIsland);
     }
 
@@ -163,7 +163,7 @@ public class ExampleTest {
         FindIsland state = new FindIsland(drone, sensor, report);
         JSONObject response = new JSONObject()
                 .put("extras", new JSONObject().put("found", "OUT_OF_RANGE"));
-        State next = state.getNextState(response);
+        SearchStates next = state.getNextSearch(response);
         assertEquals(state.getClass(), next.getClass());
     }
 
@@ -175,13 +175,13 @@ public class ExampleTest {
         GoToIsland goTo = new GoToIsland(drone, sensor, report, 2);
         JSONObject dummy = new JSONObject();
     
-        State next1 = goTo.getNextState(dummy);
+        SearchStates next1 = goTo.getNextSearch(dummy);
         assertTrue(next1 instanceof GoToIsland);
     
-        State next2 = next1.getNextState(dummy);
+        SearchStates next2 = next1.getNextSearch(dummy);
         assertTrue(next2 instanceof GoToIsland);  
     
-        State next3 = next2.getNextState(dummy);
+        SearchStates next3 = next2.getNextSearch(dummy);
         assertTrue(next3 instanceof OnIsland);   
     }
 
@@ -192,10 +192,10 @@ public class ExampleTest {
     @Test
     public void testReFindIslandTransitionsAfterLandRight() {
     ReFindIsland state = new ReFindIsland(drone, sensor, report);
-    state.getNextState(new JSONObject()); // echoRight
+    state.getNextSearch(new JSONObject()); // echoRight
     JSONObject landRight = new JSONObject()
         .put("extras", new JSONObject().put("found", "GROUND").put("range", 1));
-    State next = state.getNextState(landRight);
+    SearchStates next = state.getNextSearch(landRight);
     assertEquals(ReFindIsland.class, next.getClass()); // after turn
     }
 
@@ -204,12 +204,12 @@ public class ExampleTest {
     @Test
     public void testExitingIslandTransition() {
         JSONObject scanResponse = new JSONObject(); // First: scan step
-        onIsland.getNextState(scanResponse); // triggers scan
+        onIsland.getNextSearch(scanResponse); // triggers scan
         JSONObject flyResponse = new JSONObject()
             .put("extras", new JSONObject()
                 .put("biomes", new JSONArray().put("OCEAN")));
 
-        State result = onIsland.getNextState(flyResponse);
+        SearchStates result = onIsland.getNextSearch(flyResponse);
         assertTrue(result instanceof OnIsland); // should echoForward and wait
     }
 
@@ -218,7 +218,7 @@ public class ExampleTest {
     public void testRevisitTriggersMove() {
         drone.hasVisitedLocation(); // mark this location as visited
         JSONObject scanResponse = new JSONObject(); // dummy input
-        State nextAfter = onIsland.getNextState(scanResponse); // should moveForward due to revisit
+        SearchStates nextAfter = onIsland.getNextSearch(scanResponse); // should moveForward due to revisit
 
         assertTrue(nextAfter instanceof OnIsland); // still in same state
     }

@@ -6,12 +6,12 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Direction;
 import ca.mcmaster.se2aa4.island.team31.Report;
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  
-public class BackToIsland extends State {
+public class BackToIsland extends SearchStates {
  
     private static final Logger logger = LogManager.getLogger(BackToIsland.class);
  
@@ -49,7 +49,7 @@ public class BackToIsland extends State {
      */
 
     @Override
-    public State getNextState(JSONObject response) {
+    public SearchStates getNextSearch(JSONObject response) {
         if (currentState == TurnState.FINAL_CHECK) {
             return handleFinalCheck(response);
         }
@@ -81,14 +81,14 @@ public class BackToIsland extends State {
         return determineTurnDirection();
     }
     
-    private State handleFinalCheck(JSONObject response) {
+    private SearchStates handleFinalCheck(JSONObject response) {
         if (landDetector.foundGround(response)) {
             return new GoToIsland(drone, sensor, report, landDetector.getDistance(response));
         }
         return new ReFindIsland(drone, sensor, report);
     }
     
-    private State determineTurnDirection() {
+    private SearchStates determineTurnDirection() {
         Direction.CardinalDirection searchHeading = drone.getSearchHeading();
         Direction.CardinalDirection currentDirection = drone.getDirection();
         

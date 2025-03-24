@@ -1,7 +1,7 @@
 package ca.mcmaster.se2aa4.island.team31.Drone;
 
 import ca.mcmaster.se2aa4.island.team31.Direction;
-import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.ExplorerDrone;
 
 /**
  * handles all sensor operations for the drone

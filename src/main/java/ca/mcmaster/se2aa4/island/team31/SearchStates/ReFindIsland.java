@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
@@ -13,7 +13,7 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 /**
  * Represents a state where the drone needs to relocate a lost island.
  */
-public class ReFindIsland extends State {
+public class ReFindIsland extends SearchStates {
     private static final Logger logger = LogManager.getLogger(ReFindIsland.class);
     private final GroundSensor landDetector;
 
@@ -43,7 +43,7 @@ public class ReFindIsland extends State {
     }
 
     @Override
-    public State getNextState(JSONObject response) {
+    public SearchStates getNextSearch(JSONObject response) {
         //state machine implementation for search pattern
         if (performingFinalCheck) {
             return handleFinalCheck(response);
@@ -67,7 +67,7 @@ public class ReFindIsland extends State {
     }
 
     //handles the final forward check after turning towards potential land
-    private State handleFinalCheck(JSONObject response) {
+    private SearchStates handleFinalCheck(JSONObject response) {
         if (landDetector.foundGround(response)) {
             logger.info("** Land detected, initiating approach");
             return new GoToIsland(this.drone, this.sensor, this.report, 
@@ -78,7 +78,7 @@ public class ReFindIsland extends State {
     }
 
     //initiates forward scan after completing turn towards potential land
-    private State performForwardScan() {
+    private SearchStates performForwardScan() {
         sensor.echoForward();
         performingFinalCheck = true;
         hasCompletedTurn = false;
@@ -86,7 +86,7 @@ public class ReFindIsland extends State {
     }
 
     //processes the results of directional scans and initiates turn if land is detected
-    private State processDirectionalScanResults(JSONObject response) {
+    private SearchStates processDirectionalScanResults(JSONObject response) {
         if (processingRight && landDetector.foundGround(response)) {
             logger.info("** Land detected to the right");
             drone.turnRight();
@@ -107,7 +107,7 @@ public class ReFindIsland extends State {
     }
 
     //executes the directional scanning sequence (right then left)
-    private State executeDirectionalScan() {
+    private SearchStates executeDirectionalScan() {
         if (scanningRight) {
             logger.info("** Scanning right");
             sensor.echoRight();

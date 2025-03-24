@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
@@ -21,7 +21,7 @@ public class DroneController {
     private static final Logger log = LogManager.getLogger(DroneController.class);
 
     //state and command management
-    private State currentState;
+    private SearchStates currentState;
     private JSONObject lastCommand;
     private boolean explorationDone;
     
@@ -80,7 +80,7 @@ public class DroneController {
             return emergencyStop();
         }
 
-        currentState = currentState.getNextState(lastCommand);
+        currentState = currentState.getNextSearch(lastCommand);
         JSONObject decision = tracker.getRecentCommand();
         
         if (isStopCommand(decision)) {

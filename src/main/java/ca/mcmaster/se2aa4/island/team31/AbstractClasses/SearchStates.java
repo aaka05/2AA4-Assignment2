@@ -13,16 +13,16 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  * - Re-finding the island
  * - Making turns
  */
-public abstract class State {
+public abstract class SearchStates {
     protected final Actions drone;
     protected final Sensor sensor;
     protected final Report report;
 
-    public State(Actions drone, Sensor sensor, Report report) {
+    public SearchStates(Actions drone, Sensor sensor, Report report) {
         this.drone = drone;
         this.sensor = sensor;
         this.report = report;
     }
 
-    public abstract State getNextState(JSONObject command);
+    public abstract SearchStates getNextSearch(JSONObject command);
 }

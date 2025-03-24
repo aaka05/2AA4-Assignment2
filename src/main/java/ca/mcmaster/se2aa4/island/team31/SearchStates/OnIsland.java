@@ -6,14 +6,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses.MakeTurn;
 
 //state for exploring the island
-public class OnIsland extends State {
+public class OnIsland extends SearchStates {
     private static final Logger logger = LogManager.getLogger(OnIsland.class);
     private final GroundSensor detector;  
 
@@ -43,7 +43,7 @@ public class OnIsland extends State {
     }
 
     @Override
-    public State getNextState(JSONObject response) {
+    public SearchStates getNextSearch(JSONObject response) {
         if (leavingIsland) {
             return tryToLeaveIsland(response);  
         }
@@ -59,7 +59,7 @@ public class OnIsland extends State {
         return this;
     }
 
-    private State tryToLeaveIsland(JSONObject response) {
+    private SearchStates tryToLeaveIsland(JSONObject response) {
         if (detector.foundGround(response)) {
             return new GoToIsland(drone, sensor, report, detector.getDistance(response));
         }
@@ -71,7 +71,7 @@ public class OnIsland extends State {
         return new MakeTurn(drone, sensor, report);
     }
 
-    private State updateDronePosition(JSONObject response) {
+    private SearchStates updateDronePosition(JSONObject response) {
         checkForPOIs(response); 
         
         //check land-to-ocean transition
@@ -93,7 +93,7 @@ public class OnIsland extends State {
         return this;
     }
 
-    private State scanCurrentLocation() {
+    private SearchStates scanCurrentLocation() {
         scannedSteps++;
         logger.info("Performing scan");
 

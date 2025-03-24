@@ -5,13 +5,13 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses.SearchPattern;
 
-public class FindIsland extends State {
+public class FindIsland extends SearchStates {
 
     private static final Logger logger = LogManager.getLogger(FindIsland.class);
 
@@ -26,7 +26,7 @@ public class FindIsland extends State {
     
     //zig-zag search pattern to find the island
     @Override
-    public State getNextState(JSONObject command) {
+    public SearchStates getNextSearch(JSONObject command) {
         if (landDetector.foundGround(command)) {
             logger.info("Found land! Switching to GoToIsland state");
             return new GoToIsland(drone, sensor, report, landDetector.getDistance(command));

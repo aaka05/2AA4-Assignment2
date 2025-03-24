@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
-import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
+import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
@@ -13,7 +13,7 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.SearchStates.BackToIsland;
 import ca.mcmaster.se2aa4.island.team31.SearchStates.GoToIsland;
 
-public class MakeTurn extends State {
+public class MakeTurn extends SearchStates {
 
     private static final Logger logger = LogManager.getLogger(MakeTurn.class);
     private GroundSensor landDetector = new GroundSensor();
@@ -34,7 +34,7 @@ public class MakeTurn extends State {
     }
 
     @Override
-    public State getNextState(JSONObject response) {
+    public SearchStates getNextSearch(JSONObject response) {
         //check if we need to look for land
         if (checkLand) {
             if (landDetector.foundGround(response)) {
