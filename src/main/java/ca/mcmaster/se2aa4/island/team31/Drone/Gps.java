@@ -4,39 +4,40 @@ import java.util.EnumMap;
 import java.util.Map;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction.CardinalDirection;
 
-/**
- * Navigation system for the drone
- * Handles all directional calculations and movement vectors
- */
+
+ //navigation system for the drone
 public class Gps {
-    //maps for calculating new directions after turns
     private final Map<CardinalDirection, CardinalDirection> rightTurns;
     private final Map<CardinalDirection, CardinalDirection> leftTurns;
-    
-    //movement vectors for each direction [x, y]
     private final Map<CardinalDirection, int[]> moveVectors;
 
     public Gps() {
-        //right turns 
-        this.rightTurns = new EnumMap<>(CardinalDirection.class);
-        this.rightTurns.put(CardinalDirection.N, CardinalDirection.E);
-        this.rightTurns.put(CardinalDirection.E, CardinalDirection.S);
-        this.rightTurns.put(CardinalDirection.S, CardinalDirection.W);
-        this.rightTurns.put(CardinalDirection.W, CardinalDirection.N);
+        this.rightTurns = initializeRotationMap(true);
+        this.leftTurns = initializeRotationMap(false);
+        this.moveVectors = initializeMoveVectors();
+    }
 
-        //left turns 
-        this.leftTurns = new EnumMap<>(CardinalDirection.class);
-        this.leftTurns.put(CardinalDirection.N, CardinalDirection.W);
-        this.leftTurns.put(CardinalDirection.W, CardinalDirection.S);
-        this.leftTurns.put(CardinalDirection.S, CardinalDirection.E);
-        this.leftTurns.put(CardinalDirection.E, CardinalDirection.N);
+    private Map<CardinalDirection, CardinalDirection> initializeRotationMap(boolean isRightTurn) {
+        Map<CardinalDirection, CardinalDirection> rotationMap = new EnumMap<>(CardinalDirection.class);
+        CardinalDirection[] directions = CardinalDirection.values();
+        
+        for (int i = 0; i < directions.length; i++) {
+            //ternary operator to determine if we are doing a right or left turn
+            int nextIndex = isRightTurn ? 
+                (i + 1) % directions.length : 
+                (i - 1 + directions.length) % directions.length;
+            rotationMap.put(directions[i], directions[nextIndex]);
+        }
+        return rotationMap;
+    }
 
-        //define movement vectors for each direction
-        this.moveVectors = new EnumMap<>(CardinalDirection.class);
-        this.moveVectors.put(CardinalDirection.N, new int[]{0, 1});   // North = +y
-        this.moveVectors.put(CardinalDirection.S, new int[]{0, -1});  // South = -y
-        this.moveVectors.put(CardinalDirection.E, new int[]{1, 0});   // East = +x
-        this.moveVectors.put(CardinalDirection.W, new int[]{-1, 0});  // West = -x
+    private Map<CardinalDirection, int[]> initializeMoveVectors() {
+        Map<CardinalDirection, int[]> vectors = new EnumMap<>(CardinalDirection.class);
+        vectors.put(CardinalDirection.N, new int[]{0, 1});   // N = +y
+        vectors.put(CardinalDirection.S, new int[]{0, -1});  // S = -y
+        vectors.put(CardinalDirection.E, new int[]{1, 0});   // E = +x
+        vectors.put(CardinalDirection.W, new int[]{-1, 0});  // W = -x
+        return vectors;
     }
 
     public CardinalDirection getRight(CardinalDirection heading) {
@@ -47,7 +48,7 @@ public class Gps {
         return leftTurns.get(heading);
     }
 
-    // Returns movement vector [dx, dy] for given direction
+    //movement vector for the drone
     public int[] getForwardMovement(CardinalDirection heading) {
         return moveVectors.get(heading);
     }
