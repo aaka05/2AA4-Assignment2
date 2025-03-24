@@ -4,11 +4,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-// Report class - Singleton pattern for tracking island discoveries
+//singleton pattern for tracking island discoveries
 public class Report {
-    private static Report instance = null;  // Singleton instance
-    private JSONObject discoveries;         // Stores all POIs
-    private boolean isValid;                // Tracks if we have both creeks and sites
+    private static Report instance = null;  
+    private JSONObject discoveries;         
+    private boolean isValid;               
 
     //constructor
     private Report() {
