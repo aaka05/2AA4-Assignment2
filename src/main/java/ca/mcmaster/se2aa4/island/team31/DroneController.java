@@ -1,18 +1,15 @@
 package ca.mcmaster.se2aa4.island.team31;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import ca.mcmaster.se2aa4.island.team31.Drone.Battery;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
-import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 import ca.mcmaster.se2aa4.island.team31.Terrain.FindIsland;
 import ca.mcmaster.se2aa4.island.team31.Terrain.Report;
 import ca.mcmaster.se2aa4.island.team31.Terrain.State;
@@ -25,43 +22,40 @@ public class DroneController {
 
     private static final Logger log = LogManager.getLogger(DroneController.class);
 
-    private final DroneTracker tracker;
-    private final MovementController drone;
-    private final Sensor sensor;
-    private final Battery battery;
-    private final Constraints constraints;
-    private final Report report;
-
-    //state management
+    //state and command management
     private State currentState;
     private JSONObject lastCommand;
     private boolean explorationDone;
+    
+    //drone components
+    private final DroneTracker tracker;
+    private final MovementController drone;
+    private final Sensor sensor;
+    private final Constraints constraints;
+    private final Report report;
 
     public DroneController(int batteryLevel, String direction) {
-        //set initial heading (default East if invalid)
-        Direction.CardinalDirection startDir = Direction.CardinalDirection.E;
-        try {
-            startDir = Direction.CardinalDirection.valueOf(direction);
-        } catch (Exception e) {
-            log.error("Bad direction input, defaulting to East", e);
-        }
-
-        //initialize drone components
-        this.battery = new Battery(batteryLevel);
+        Direction.CardinalDirection startDir = parseInitialDirection(direction);
+        
+        //initialize all final fields directly in constructor
         this.sensor = new Sensor(startDir);
         this.drone = new MovementController(batteryLevel, startDir, this.sensor);
         this.constraints = new Constraints(this.drone);
         this.report = Report.getInstance();
-
-        //start with island search state (zigzag pattern)
         this.currentState = new FindIsland(this.drone, this.sensor, this.report);
-
-        //setup action tracking
-        List<ExplorerDrone> components = Arrays.asList(this.drone, this.sensor);
-        this.tracker = new DroneTracker(components);
+        this.tracker = new DroneTracker(Arrays.asList(this.drone, this.sensor));
         
         this.explorationDone = false;
-        log.info("Drone initialized, heading " + startDir);
+        log.info("Drone initialized, heading {}", startDir);
+    }
+
+    private Direction.CardinalDirection parseInitialDirection(String direction) {
+        try {
+            return Direction.CardinalDirection.valueOf(direction);
+        } catch (Exception e) {
+            log.error("Bad direction input, defaulting to East", e);
+            return Direction.CardinalDirection.E;
+        }
     }
 
     //battery management
@@ -92,13 +86,19 @@ public class DroneController {
     public JSONObject takeDecision() {
         updateBatteryLevel();
 
-        //check battery status
         if (!constraints.canContinue()) {
             setExplorationDone(true);
             return emergencyStop();
         }
 
-        //process state transitions
+        processStateTransitions();
+        
+        JSONObject decision = tracker.getRecentCommand();
+        checkForStopCommand(decision);
+        return decision;
+    }
+
+    private void processStateTransitions() {
         State nextState;
         State current;
         do {
@@ -106,10 +106,6 @@ public class DroneController {
             nextState = this.currentState.getNextState(this.lastCommand);
             this.currentState = nextState;
         } while (!current.equals(nextState));
-
-        JSONObject decision = tracker.getRecentCommand();
-        checkForStopCommand(decision);
-        return decision;
     }
 
     public void updateDrone(JSONObject command) {
