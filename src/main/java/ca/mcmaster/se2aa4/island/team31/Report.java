@@ -11,7 +11,7 @@ public class Report {
     private JSONObject discoveries;         // Stores all POIs
     private boolean isValid;                // Tracks if we have both creeks and sites
 
-    // Constructor
+    //constructor
     private Report() {
         discoveries = new JSONObject();
         discoveries.put("creeks", new JSONArray());
@@ -19,7 +19,7 @@ public class Report {
         isValid = false;
     }
 
-    // Singleton getter
+    //singleton getter
     public static Report getInstance() {
         if (instance == null) {
             instance = new Report();
@@ -27,7 +27,7 @@ public class Report {
         return instance;
     }
 
-    // Add methods
+    //add methods
     public void addCreek(String id, int x, int y) {
         JSONObject creek = createPOI(id, x, y);
         discoveries.getJSONArray("creeks").put(creek);
@@ -40,7 +40,7 @@ public class Report {
         updateValidity();
     }
 
-    // Helper method for creating POIs
+    //helper method for creating POIs
     private JSONObject createPOI(String id, int x, int y) {
         JSONObject poi = new JSONObject();
         poi.put("id", id);
@@ -49,7 +49,7 @@ public class Report {
         return poi;
     }
 
-    // Getters
+    //getter methods 
     public JSONArray getCreeks() {
         return discoveries.getJSONArray("creeks");
     }
@@ -66,12 +66,12 @@ public class Report {
         return isValid;
     }
 
-    // Distance calculation
+    //distance calculation
     private double calculateDistance(int x1, int y1, int x2, int y2) {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
-    // Find closest creek to emergency site
+    //find closest creek to emergency site
     public String getClosestCreekToSite() {
         if (!isValid) {
             return "No valid data available";
@@ -98,32 +98,60 @@ public class Report {
         return closestCreek;
     }
 
-    // Display all discoveries
+    //display all discoveries
     public String displayDiscoveries() {
         StringBuilder report = new StringBuilder();
-        
-        report.append("Creeks Found: \n");
-        if (getCreeks().length() == 0) {
-            report.append("  None found\n");
-        } else {
-            for (int i = 0; i < getCreeks().length(); i++) {
-                report.append(formatPOI(getCreeks().getJSONObject(i)));
-            }
-        }
-        
-        report.append("Emergency Site: \n");
-        if (getSites().length() == 0) {
-            report.append("  None found\n");
-        } else {
-            report.append(formatPOI(getSites().getJSONObject(0)));
-        }
-
-        report.append("Closest creek: ").append(getClosestCreekToSite()).append("\n");
+        report.append(createHeader())
+              .append(createCreeksSection())
+              .append(createEmergencySiteSection())
+              .append(createClosestCreekSection());
         return report.toString();
     }
 
+    private String createHeader() {
+        return "\n=== Island Exploration Report ===\n\n";
+    }
+
+    private String createCreeksSection() {
+        StringBuilder section = new StringBuilder();
+        section.append("CREEKS FOUND:\n");
+        section.append("-------------\n");
+        
+        if (getCreeks().length() == 0) {
+            section.append("   No creeks discovered yet\n");
+        } else {
+            for (int i = 0; i < getCreeks().length(); i++) {
+                section.append(formatPOI(getCreeks().getJSONObject(i)));
+            }
+        }
+        section.append("\n");
+        return section.toString();
+    }
+
+    private String createEmergencySiteSection() {
+        StringBuilder section = new StringBuilder();
+        section.append("EMERGENCY SITE:\n");
+        section.append("--------------\n");
+        
+        if (getSites().length() == 0) {
+            section.append("   No emergency site found yet\n");
+        } else {
+            section.append(formatPOI(getSites().getJSONObject(0)));
+        }
+        section.append("\n");
+        return section.toString();
+    }
+
+    private String createClosestCreekSection() {
+        StringBuilder section = new StringBuilder();
+        section.append("NEAREST CREEK TO EMERGENCY SITE:\n");
+        section.append("------------------------------\n");
+        section.append("   ").append(getClosestCreekToSite()).append("\n\n");
+        return section.toString();
+    }
+
     private String formatPOI(JSONObject poi) {
-        return String.format("  - %s at (%d,%d)\n",
+        return String.format("   * %s at coordinates (%d, %d)\n",
                 poi.getString("id"),
                 poi.getInt("x"),
                 poi.getInt("y"));
