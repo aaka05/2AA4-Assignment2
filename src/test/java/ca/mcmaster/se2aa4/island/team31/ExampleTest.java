@@ -3,6 +3,7 @@ package ca.mcmaster.se2aa4.island.team31;
 import java.io.File;
 import java.lang.reflect.Field;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import ca.mcmaster.se2aa4.island.team31.Drone.Battery;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
@@ -28,28 +28,27 @@ public class ExampleTest {
 
     private MovementController drone;
     private Sensor sensor;
-    private Battery battery;
     private LandDetector landDetector;
     private Report report;
     private Constraints constraints;
+    private OnIsland onIsland;
+
 
     @BeforeEach
-    public void init() {
+    public void setup() throws Exception {
         sensor = new Sensor(Direction.CardinalDirection.E);
         drone = new MovementController(7000, Direction.CardinalDirection.E, sensor);
-        battery = new Battery(7000);
         landDetector = new LandDetector();
         report = Report.getInstance();
         constraints = new Constraints(drone);
+        onIsland = new OnIsland(drone, sensor, report);
+    
+        // Reset singleton Report
+        Field instance = Report.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
     }
-
-
-    @BeforeEach
-    public void resetReport() throws Exception {
-    Field instance = Report.class.getDeclaredField("instance");
-    instance.setAccessible(true);
-    instance.set(null, null);  // Reset singleton
-}
+    
 
 
     @Test
@@ -196,6 +195,30 @@ public class ExampleTest {
     }
 
 
+    // Simulate ocean detection and check transition
+    @Test
+    public void testExitingIslandTransition() {
+        JSONObject scanResponse = new JSONObject(); // First: scan step
+        onIsland.getNextState(scanResponse); // triggers scan
+        JSONObject flyResponse = new JSONObject()
+            .put("extras", new JSONObject()
+                .put("biomes", new JSONArray().put("OCEAN")));
+
+        State result = onIsland.getNextState(flyResponse);
+        assertTrue(result instanceof OnIsland); // should echoForward and wait
+    }
+
+    // 🔁 Revisit logic triggers moveForward
+    @Test
+    public void testRevisitTriggersMove() {
+        drone.hasVisitedLocation(); // mark this location as visited
+        JSONObject scanResponse = new JSONObject(); // dummy input
+
+        State next = onIsland.getNextState(scanResponse); // should scan
+        State nextAfter = onIsland.getNextState(scanResponse); // should moveForward due to revisit
+
+        assertTrue(nextAfter instanceof OnIsland); // still in same state
+    }
 
 
     // TEST: Report
