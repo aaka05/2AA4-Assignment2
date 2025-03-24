@@ -33,7 +33,7 @@ public class DroneController {
     private final Report report;
 
     public DroneController(int batteryLevel, String direction) {
-        Direction.CardinalDirection startDir = parseInitialDirection(direction);
+        Direction.CardinalDirection startDir = Direction.CardinalDirection.valueOf(direction);
         
         //initialize all final fields directly in constructor
         this.sensor = new Sensor(startDir);
@@ -45,15 +45,6 @@ public class DroneController {
         
         this.explorationDone = false;
         log.info("Drone initialized, heading {}", startDir);
-    }
-
-    private Direction.CardinalDirection parseInitialDirection(String direction) {
-        try {
-            return Direction.CardinalDirection.valueOf(direction);
-        } catch (Exception e) {
-            log.error("Bad direction input, defaulting to East", e);
-            return Direction.CardinalDirection.E;
-        }
     }
 
     //battery management
@@ -83,42 +74,29 @@ public class DroneController {
     //main decision loop
     public JSONObject takeDecision() {
         updateBatteryLevel();
-
+        
         if (!constraints.canContinue()) {
-            setExplorationDone(true);
+            explorationDone = true;
             return emergencyStop();
         }
 
-        processStateTransitions();
-        
+        currentState = currentState.getNextState(lastCommand);
         JSONObject decision = tracker.getRecentCommand();
-        checkForStopCommand(decision);
+        
+        if (isStopCommand(decision)) {
+            explorationDone = true;
+            log.info("Exploration complete");
+        }
+        
         return decision;
     }
 
-    private void processStateTransitions() {
-        State nextState;
-        State current;
-        do {
-            current = this.currentState;
-            nextState = this.currentState.getNextState(this.lastCommand);
-            this.currentState = nextState;
-        } while (!current.equals(nextState));
+    private boolean isStopCommand(JSONObject decision) {
+        return decision.has("action") && "stop".equals(decision.getString("action"));
     }
 
     public void updateDrone(JSONObject command) {
         this.lastCommand = command;
-    }
-
-    private void checkForStopCommand(JSONObject decision) {
-        if (decision.has("action") && "stop".equals(decision.getString("action"))) {
-            log.info("Exploration complete");
-            this.explorationDone = true;
-        }
-    }
-    
-    private void setExplorationDone(boolean done) {
-        this.explorationDone = done;
     }
 
     public boolean isExplorationComplete() {
