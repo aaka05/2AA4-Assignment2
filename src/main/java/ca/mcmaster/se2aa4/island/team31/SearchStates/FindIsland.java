@@ -9,6 +9,7 @@ import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
 import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses.SearchPattern;
 
 public class FindIsland extends State {
 

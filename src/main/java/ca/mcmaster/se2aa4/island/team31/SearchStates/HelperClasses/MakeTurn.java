@@ -1,4 +1,4 @@
-package ca.mcmaster.se2aa4.island.team31.SearchStates;
+package ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +10,8 @@ import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
 import ca.mcmaster.se2aa4.island.team31.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.BackToIsland;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.GoToIsland;
 
 public class MakeTurn extends State {
 

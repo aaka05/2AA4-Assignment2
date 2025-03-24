@@ -1,4 +1,4 @@
-package ca.mcmaster.se2aa4.island.team31.SearchStates;
+package ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses;
 
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
