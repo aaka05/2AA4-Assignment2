@@ -219,8 +219,6 @@ public class ExampleTest {
     public void testRevisitTriggersMove() {
         drone.hasVisitedLocation(); // mark this location as visited
         JSONObject scanResponse = new JSONObject(); // dummy input
-
-        State next = onIsland.getNextState(scanResponse); // should scan
         State nextAfter = onIsland.getNextState(scanResponse); // should moveForward due to revisit
 
         assertTrue(nextAfter instanceof OnIsland); // still in same state
