@@ -13,45 +13,22 @@ public class FindIsland extends State {
 
     private final LandDetector landDetector = new LandDetector();
     
-    //these control our zig-zag search pattern
-    private boolean turnRight;
-    private boolean turnLeft;
-    private boolean echo;
+    private final SearchPattern searchPattern;
 
     public FindIsland(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
-        this.turnRight = true;
-        this.turnLeft = false;
-        this.echo = false;
+        this.searchPattern = new SearchPattern(drone, sensor);
     }
-
-    /**
-     * Makes the drone move in a zig-zag pattern to find the island.
-     * alternates between moving diagonally right and left while checking for land.
-     */
+    
+    //zig-zag search pattern to find the island
     @Override
     public State getNextState(JSONObject command) {
         if (landDetector.foundGround(command)) {
             logger.info("Found land! Switching to GoToIsland state");
-            int distance = landDetector.getDistance(command);
-            return new GoToIsland(this.drone, this.sensor, this.report, distance);
+            return new GoToIsland(drone, sensor, report, landDetector.getDistance(command));
         }
 
-        if (echo) {
-            sensor.echoForward();
-            echo = false;
-        } else if (turnRight) {
-            drone.turnRight();  // diagonal down-right
-            turnRight = false;
-            turnLeft = true;
-            echo = true;
-        } else if (turnLeft) {
-            drone.turnLeft();   // diagonal down-left
-            turnLeft = false;
-            turnRight = true;
-            echo = true;
-        }
-
+        searchPattern.executeNextMove();
         return this;
     }
 }
