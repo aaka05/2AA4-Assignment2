@@ -7,63 +7,63 @@ import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
-//state class for when the drone needs to relocate the island
-//uses a systematic scanning pattern: right -> left -> forward
+/**
+ * Represents a state where the drone needs to relocate a lost island.
+ */
 public class ReFindIsland extends State {
     private static final Logger logger = LogManager.getLogger(ReFindIsland.class);
     private final LandDetector landDetector;
 
-    //scanning phase flags
-    private boolean echoRight;    
-    private boolean echoLeft;     
-    private boolean checkRight;   
-    private boolean checkLeft;    
-    private boolean turnComplete; 
-    private boolean finalCheck;  
+    //search pattern state flags
+    private boolean scanningRight;    
+    private boolean scanningLeft;    
+    private boolean processingRight;  
+    private boolean processingLeft;   
+    private boolean hasCompletedTurn; 
+    private boolean performingFinalCheck; 
 
     public ReFindIsland(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
         this.landDetector = new LandDetector();
-        
-        //initialize scanning sequence
-        echoRight = true;     //start by scanning right
-        echoLeft = false;
-        checkRight = false;
-        checkLeft = false;
-        turnComplete = false;
-        finalCheck = false;
-
+        initializeSearchPattern();
         logger.info("** Starting island relocation sequence");
+    }
+
+    //initialize search pattern
+    private void initializeSearchPattern() {
+        scanningRight = true;      
+        scanningLeft = false;
+        processingRight = false;
+        processingLeft = false;
+        hasCompletedTurn = false;
+        performingFinalCheck = false;
     }
 
     @Override
     public State getNextState(JSONObject response) {
-        //final check after turning towards potential land
-        if (finalCheck) {
+        //state machine implementation for search pattern
+        if (performingFinalCheck) {
             return handleFinalCheck(response);
         }
 
-        //handle post-turn forward scan
-        if (turnComplete) {
-            return handleTurnComplete();
+        if (hasCompletedTurn) {
+            return performForwardScan();
         }
 
-        //process scan results
-        if (checkRight || checkLeft) {
-            return handleScanResults(response);
+        if (processingRight || processingLeft) {
+            return processDirectionalScanResults(response);
         }
 
-        //perform directional scans
-        if (echoRight || echoLeft) {
-            return performDirectionalScan();
+        if (scanningRight || scanningLeft) {
+            return executeDirectionalScan();
         }
 
-        //if we reach here, stop and wait for next command
+        //stop and wait for next command
         drone.stop();
         return this;
     }
 
-    //handles the final forward check after turning
+    //handles the final forward check after turning towards potential land
     private State handleFinalCheck(JSONObject response) {
         if (landDetector.foundGround(response)) {
             logger.info("** Land detected, initiating approach");
@@ -74,51 +74,50 @@ public class ReFindIsland extends State {
         return new ReFindIsland(this.drone, this.sensor, this.report);
     }
 
-    //initiatze forward scan after completing turn
-    private State handleTurnComplete() {
+    //initiates forward scan after completing turn towards potential land
+    private State performForwardScan() {
         sensor.echoForward();
-        finalCheck = true;
-        turnComplete = false;
+        performingFinalCheck = true;
+        hasCompletedTurn = false;
         return this;
     }
 
-    //processes the results of right/left scans
-    private State handleScanResults(JSONObject response) {
-        if (checkRight) {
-            if (landDetector.foundGround(response)) {
-                logger.info("** Land detected to the right");
-                drone.turnRight();
-                turnComplete = true;
-                return this;
-            }
-            checkRight = false;
-        } else if (checkLeft) {
-            if (landDetector.foundGround(response)) {
-                logger.info("** Land detected to the left");
-                drone.turnLeft();
-                turnComplete = true;
-                return this;
-            }
-            checkLeft = false;
+    //processes the results of directional scans and initiates turn if land is detected
+    private State processDirectionalScanResults(JSONObject response) {
+        if (processingRight && landDetector.foundGround(response)) {
+            logger.info("** Land detected to the right");
+            drone.turnRight();
+            hasCompletedTurn = true;
+            processingRight = false;
+            return this;
+        } else if (processingLeft && landDetector.foundGround(response)) {
+            logger.info("** Land detected to the left");
+            drone.turnLeft();
+            hasCompletedTurn = true;
+            processingLeft = false;
+            return this;
         }
+        
+        //reset flags if no land detected
+        processingRight = processingLeft = false;
         return this;
     }
 
-    //performs directional scanning sequence
-    private State performDirectionalScan() {
-        if (echoRight) {
+    //executes the directional scanning sequence (right then left)
+    private State executeDirectionalScan() {
+        if (scanningRight) {
             logger.info("** Scanning right");
             sensor.echoRight();
-            checkRight = true;
-            echoLeft = true;
-            echoRight = false;
+            processingRight = true;
+            scanningLeft = true;
+            scanningRight = false;
             return this;
-        } else if (echoLeft) {
+        } else if (scanningLeft) {
             logger.info("** Scanning left");
             sensor.echoLeft();
-            echoRight = false;
-            checkLeft = true;
-            echoLeft = false;
+            scanningRight = false;
+            processingLeft = true;
+            scanningLeft = false;
             return this;
         }
         return this;
