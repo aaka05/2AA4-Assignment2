@@ -51,6 +51,8 @@ public class Explorer implements IExplorerRaid {
         JSONObject extraInfo = response.getJSONObject("extras");
         logger.info("Additional information received: {}", extraInfo);
 
+        logger.info("--------------------------------------------------------");
+
         droneController.updateDrone(response);
         if (this.droneController.isExplorationComplete()) {
             String results = deliverFinalReport();

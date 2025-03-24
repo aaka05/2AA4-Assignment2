@@ -118,7 +118,7 @@ public class Report {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
-    public String presentDiscoveries() {
+    public String displayDiscoveries() {
         StringBuilder report = new StringBuilder();
         
         //format creek information

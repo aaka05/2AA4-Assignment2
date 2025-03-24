@@ -14,8 +14,8 @@ import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Enums.Direction;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 import ca.mcmaster.se2aa4.island.team31.Terrain.FindIsland;
-import ca.mcmaster.se2aa4.island.team31.Terrain.State;
 import ca.mcmaster.se2aa4.island.team31.Terrain.Report;
+import ca.mcmaster.se2aa4.island.team31.Terrain.State;
 
 /**
  * main controller class for the exploration drone
@@ -132,7 +132,7 @@ public class DroneController {
     }
 
     public String getDiscoveries() {
-        return this.report.presentDiscoveries();
+        return this.report.displayDiscoveries();
     }
 
 }

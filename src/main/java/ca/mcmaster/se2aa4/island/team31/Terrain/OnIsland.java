@@ -122,7 +122,7 @@ public class OnIsland extends State {
     //handles POI detection 
     private void handlePOIDetection(JSONObject response) {
         if (foundCreek(response)) {
-            logger.info("** Creek Found!");
+            logger.info("** Creek has been Found! Adding to drone report");
             String[] creeks = getCreeks(response);
             for (String creek : creeks) {
                 addCreekToReport(creek);
@@ -131,7 +131,7 @@ public class OnIsland extends State {
 
         //emergency site found
         if (foundSite(response)) {
-            logger.info("** Emergency Site Found!");
+            logger.info("** Emergency Site has been Found! Adding to drone report");
             String[] sites = getSites(response);
             for (String site : sites) {
                 addSiteToReport(site);
