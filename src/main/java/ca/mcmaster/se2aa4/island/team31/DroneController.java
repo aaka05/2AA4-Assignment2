@@ -26,7 +26,7 @@ public class DroneController {
     private boolean explorationDone;
     
     //drone components
-    private final DroneTracker tracker;
+    private final DroneActionMonitor tracker;
     private final MovementController drone;
     private final Sensor sensor;
     private final Constraints constraints;
@@ -41,7 +41,7 @@ public class DroneController {
         this.constraints = new Constraints(this.drone);
         this.report = Report.getInstance();
         this.currentState = new FindIsland(this.drone, this.sensor, this.report);
-        this.tracker = new DroneTracker(Arrays.asList(this.drone, this.sensor));
+        this.tracker = new DroneActionMonitor(Arrays.asList(this.drone, this.sensor));
         
         this.explorationDone = false;
         log.info("Drone initialized, heading {}", startDir);

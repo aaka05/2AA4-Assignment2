@@ -10,12 +10,12 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.DroneCommander;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ExplorerDrone;
 
 //acts as an observer for drone components to record their actions
-public class DroneTracker implements DroneCommander {
+public class DroneActionMonitor implements DroneCommander {
     //stack of commands executed by the drone
     private final Deque<JSONObject> commandHistory;
     private static final int maxHistorySize = 1000; // Prevent unbounded growth
 
-    public DroneTracker(List<ExplorerDrone> components) {
+    public DroneActionMonitor(List<ExplorerDrone> components) {
         this.commandHistory = new LinkedList<>();
         registerComponents(components);
     }
