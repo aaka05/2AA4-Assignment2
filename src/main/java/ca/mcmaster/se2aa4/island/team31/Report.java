@@ -3,9 +3,8 @@ package ca.mcmaster.se2aa4.island.team31;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/**
- * Report class - Singleton pattern for tracking island discoveries
- */
+
+// Report class - Singleton pattern for tracking island discoveries
 public class Report {
     private static Report instance = null;  // Singleton instance
     private JSONObject discoveries;         // Stores all POIs
