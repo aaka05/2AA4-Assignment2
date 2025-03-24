@@ -36,6 +36,7 @@ public class ExampleTest {
 
     @BeforeEach
     public void setup() throws Exception {
+        // Initialize drone components with starting direction East
         sensor = new Sensor(Direction.CardinalDirection.E);
         drone = new MovementController(7000, Direction.CardinalDirection.E, sensor);
         landDetector = new LandDetector();
@@ -43,7 +44,7 @@ public class ExampleTest {
         constraints = new Constraints(drone);
         onIsland = new OnIsland(drone, sensor, report);
     
-        // Reset singleton Report
+        // Need to reset the Report singleton between tests to avoid state bleeding
         Field instance = Report.class.getDeclaredField("instance");
         instance.setAccessible(true);
         instance.set(null, null);
@@ -62,7 +63,7 @@ public class ExampleTest {
     @Test
     public void testEchoRight() {
         Sensor sensor = new Sensor(Direction.CardinalDirection.N);
-        assertDoesNotThrow(sensor::echoRight);  // just validate update is called
+        assertDoesNotThrow(sensor::echoRight);  // Make sure echo doesn't crash
     }
 
     @Test
@@ -100,11 +101,13 @@ public class ExampleTest {
 
     @Test
     public void testMoveForwardPosition() {
+        // Track starting position
         int startX = drone.getX();
         int startY = drone.getY();
 
         drone.moveForward();
 
+        // Should move one unit east (x+1) since starting direction is east
         int newX = drone.getX();
         int newY = drone.getY();
 
@@ -115,6 +118,7 @@ public class ExampleTest {
     // TEST: LandDetector
     @Test
     public void testLandDetectionTrue() {
+        // Mock response from sensor when ground is detected
         JSONObject response = new JSONObject()
                 .put("extras", new JSONObject()
                         .put("found", "GROUND")
@@ -167,6 +171,8 @@ public class ExampleTest {
     // TEST: GoToIsland behavior
     @Test
     public void testGoToIslandProgresses() {
+        // Should transition: GoToIsland -> GoToIsland -> GoToIsland -> OnIsland
+        // (takes 3 steps to reach island when distance is 2)
         GoToIsland goTo = new GoToIsland(drone, sensor, report, 2);
         JSONObject dummy = new JSONObject();
     
@@ -239,6 +245,7 @@ public class ExampleTest {
 
     @Test
     public void map03Test() {
+        // Test full exploration on map03 with specific parameters
         String filename = "./maps/map03.json";
         try {
             run(Explorer.class)
