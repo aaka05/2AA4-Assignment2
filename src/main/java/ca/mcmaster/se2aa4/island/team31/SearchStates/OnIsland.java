@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
 import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
-import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
+import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses.MakeTurn;
@@ -15,7 +15,7 @@ import ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses.MakeTurn;
 //state for exploring the island
 public class OnIsland extends State {
     private static final Logger logger = LogManager.getLogger(OnIsland.class);
-    private final LandDetector detector;  
+    private final GroundSensor detector;  
 
     //control flags
     private boolean needToScan;      
@@ -29,7 +29,7 @@ public class OnIsland extends State {
 
     public OnIsland(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
-        detector = new LandDetector();
+        detector = new GroundSensor();
         
         
         needToScan = true;

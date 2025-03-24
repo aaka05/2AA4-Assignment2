@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
-import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
+import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
@@ -27,7 +27,7 @@ public class ExampleTest {
 
     private MovementController drone;
     private Sensor sensor;
-    private LandDetector landDetector;
+    private GroundSensor landDetector;
     private Report report;
     private Constraints constraints;
     private OnIsland onIsland;
@@ -38,7 +38,7 @@ public class ExampleTest {
         // Initialize drone components with starting direction East
         sensor = new Sensor(Direction.CardinalDirection.E);
         drone = new MovementController(7000, Direction.CardinalDirection.E, sensor);
-        landDetector = new LandDetector();
+        landDetector = new GroundSensor();
         report = Report.getInstance();
         constraints = new Constraints(drone);
         onIsland = new OnIsland(drone, sensor, report);

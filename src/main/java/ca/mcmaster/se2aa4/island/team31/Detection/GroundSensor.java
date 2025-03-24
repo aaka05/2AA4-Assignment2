@@ -2,7 +2,7 @@ package ca.mcmaster.se2aa4.island.team31.Detection;
 
 import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ILandDetector;
-public class LandDetector implements ILandDetector {
+public class GroundSensor implements ILandDetector {
 
     // Helper method to safely get the extras object
     private JSONObject getExtras(JSONObject response) {

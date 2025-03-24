@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
 import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
-import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
+import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
@@ -16,7 +16,7 @@ import ca.mcmaster.se2aa4.island.team31.SearchStates.GoToIsland;
 public class MakeTurn extends State {
 
     private static final Logger logger = LogManager.getLogger(MakeTurn.class);
-    private LandDetector landDetector = new LandDetector();
+    private GroundSensor landDetector = new GroundSensor();
     
     //state flags for the turn sequence
     private boolean droneHasTurned;

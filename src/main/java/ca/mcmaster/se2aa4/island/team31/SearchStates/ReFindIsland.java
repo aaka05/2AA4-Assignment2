@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Report;
 import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
-import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
+import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
@@ -15,7 +15,7 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  */
 public class ReFindIsland extends State {
     private static final Logger logger = LogManager.getLogger(ReFindIsland.class);
-    private final LandDetector landDetector;
+    private final GroundSensor landDetector;
 
     //search pattern state flags
     private boolean scanningRight;    
@@ -27,7 +27,7 @@ public class ReFindIsland extends State {
 
     public ReFindIsland(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
-        this.landDetector = new LandDetector();
+        this.landDetector = new GroundSensor();
         initializeSearchPattern();
         logger.info("** Starting island relocation sequence");
     }

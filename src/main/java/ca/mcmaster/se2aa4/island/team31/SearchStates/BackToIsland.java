@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.team31.Direction;
 import ca.mcmaster.se2aa4.island.team31.Report;
 import ca.mcmaster.se2aa4.island.team31.AbstractClasses.State;
-import ca.mcmaster.se2aa4.island.team31.Detection.LandDetector;
+import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  
@@ -16,7 +16,7 @@ public class BackToIsland extends State {
     private static final Logger logger = LogManager.getLogger(BackToIsland.class);
  
     //helper class to check if drone can see ground
-    private final LandDetector landDetector;
+    private final GroundSensor landDetector;
     
     //Encapsulate turn states in an enum
     private enum TurnState {
@@ -32,7 +32,7 @@ public class BackToIsland extends State {
    
     public BackToIsland(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
-        landDetector = new LandDetector();
+        landDetector = new GroundSensor();
         currentState = TurnState.INITIAL;
         logger.info("Starting BackToIsland state - trying to get back to the island!");
     }
