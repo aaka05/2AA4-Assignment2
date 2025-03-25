@@ -91,18 +91,22 @@ public class MissionControl {
         return decision;
     }
 
+    //checks if the command is a stop command
     private boolean isStopCommand(JSONObject decision) {
         return decision.has("action") && "stop".equals(decision.getString("action"));
     }
 
+    //updates the last command
     public void updateDrone(JSONObject command) {
         this.lastCommand = command;
     }
 
+    //checks if the exploration is complete
     public boolean isExplorationComplete() {
         return this.explorationDone;
     }
 
+    //displays the POIs found
     public String getDiscoveries() {
         return this.report.displayDiscoveries();
     }

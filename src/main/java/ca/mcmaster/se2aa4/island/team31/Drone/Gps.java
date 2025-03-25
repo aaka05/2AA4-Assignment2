@@ -13,10 +13,12 @@ public class Gps {
     };
 
     public CardinalDirection getRight(CardinalDirection heading) {
+        //implementation of circular array
         return CardinalDirection.values()[(heading.ordinal() + 1) % 4];
     }
 
     public CardinalDirection getLeft(CardinalDirection heading) {
+        //implementation of circular array
         return CardinalDirection.values()[(heading.ordinal() + 3) % 4];
     }
 

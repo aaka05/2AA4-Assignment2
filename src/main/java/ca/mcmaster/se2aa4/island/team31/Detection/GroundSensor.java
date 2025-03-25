@@ -4,7 +4,7 @@ import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.ILandDetector;
 public class GroundSensor implements ILandDetector {
 
-    // Helper method to safely get the extras object
+    //helper method to safely get the extras object
     private JSONObject getExtras(JSONObject response) {
         if (response != null && response.has("extras")) {
             return response.getJSONObject("extras");

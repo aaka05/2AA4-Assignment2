@@ -6,9 +6,7 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.team31.Direction;
 
-/**
- * Handles all possible drone actions by creating appropriate JSON commands
- */
+//handles all possible drone actions by creating appropriate JSON commands
 public class DroneActions {
     private static final Logger log = LogManager.getLogger(DroneActions.class);
 
@@ -30,10 +28,8 @@ public class DroneActions {
         return cmd;
     }
 
-    /**
-     * Sends out an echo in specified direction to detect obstacles
-     * Returns distance to nearest obstacle if one exists
-     */
+        
+    //send out echo pulse in specified direction
     public JSONObject echo(Direction.CardinalDirection dir) {
         JSONObject cmd = new JSONObject();
         JSONObject params = new JSONObject();
