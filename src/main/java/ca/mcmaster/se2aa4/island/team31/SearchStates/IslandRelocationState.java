@@ -13,8 +13,8 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 /**
  * Represents a state where the drone needs to relocate a lost island.
  */
-public class ReFindIsland extends SearchStates {
-    private static final Logger logger = LogManager.getLogger(ReFindIsland.class);
+public class IslandRelocationState extends SearchStates {
+    private static final Logger logger = LogManager.getLogger(IslandRelocationState.class);
     private final GroundSensor landDetector;
 
     //search pattern state flags
@@ -25,7 +25,7 @@ public class ReFindIsland extends SearchStates {
     private boolean hasCompletedTurn; 
     private boolean performingFinalCheck; 
 
-    public ReFindIsland(Actions drone, Sensor sensor, Report report) {
+    public IslandRelocationState(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
         this.landDetector = new GroundSensor();
         initializeSearchPattern();
@@ -70,11 +70,11 @@ public class ReFindIsland extends SearchStates {
     private SearchStates handleFinalCheck(JSONObject response) {
         if (landDetector.foundGround(response)) {
             logger.info("** Land detected, initiating approach");
-            return new GoToIsland(this.drone, this.sensor, this.report, 
+            return new ApproachIslandState(this.drone, this.sensor, this.report, 
                                 landDetector.getDistance(response));
         }
         logger.info("** No land found, restarting search pattern");
-        return new ReFindIsland(this.drone, this.sensor, this.report);
+        return new IslandRelocationState(this.drone, this.sensor, this.report);
     }
 
     //initiates forward scan after completing turn towards potential land

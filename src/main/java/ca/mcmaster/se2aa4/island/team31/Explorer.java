@@ -12,7 +12,7 @@ import eu.ace_design.island.bot.IExplorerRaid;
 public class Explorer implements IExplorerRaid {
 
     private final Logger logger = LogManager.getLogger();
-    private DroneController droneController;
+    private MissionControl droneController;
 
     @Override
     public void initialize(String s) {
@@ -24,7 +24,7 @@ public class Explorer implements IExplorerRaid {
         logger.info("The drone is facing {}", direction);
         logger.info("Battery level is {}", batteryLevel);
 
-        droneController = new DroneController(batteryLevel, direction);
+        droneController = new MissionControl(batteryLevel, direction);
 
     }
 

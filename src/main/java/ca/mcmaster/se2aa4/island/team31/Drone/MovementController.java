@@ -12,13 +12,13 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  * handles position tracking, battery management, and movement commands
  */
 public class MovementController extends ExplorerDrone implements Actions {
+
     private final Gps gps;
     private final Sensor sensor;
     private final Battery battery;
     private final DroneActions actions;
     
-    //position tracking
-    private int x, y;
+    private final Position position;
     private Direction.CardinalDirection heading;
     private Direction.CardinalDirection searchHeading;
     
@@ -32,14 +32,9 @@ public class MovementController extends ExplorerDrone implements Actions {
         this.heading = startDir;
         this.sensor = sensor;
         this.actions = new DroneActions();
+        this.position = new Position(); //creates position at (1,1)
         
-        //initialize search direction (90° right of heading)
         this.searchHeading = gps.getRight(this.heading);
-        
-        //start at origin (0,0)
-        this.x = 0;
-        this.y = 0;
-        
         this.visitedLocations = new HashSet<>();
         this.turnPoints = new HashSet<>();
     }
@@ -47,8 +42,7 @@ public class MovementController extends ExplorerDrone implements Actions {
     //updates position based on current heading
     private void updatePosition() {
         int[] movement = gps.getForwardMovement(this.heading);
-        this.x += movement[0];
-        this.y += movement[1];
+        position.move(movement[0], movement[1]);
     }
 
     @Override
@@ -86,10 +80,10 @@ public class MovementController extends ExplorerDrone implements Actions {
 
     //position and heading getters
     @Override
-    public int getX() { return x; }
+    public int getX() { return position.getX(); }
     
     @Override
-    public int getY() { return y; }
+    public int getY() { return position.getY(); }
     
     @Override
     public Direction.CardinalDirection getDirection() { return heading; }
@@ -110,7 +104,7 @@ public class MovementController extends ExplorerDrone implements Actions {
     //location tracking methods
     @Override
     public boolean hasVisitedLocation() {
-        String pos = x + "," + y;
+        String pos = position.toString();
         if (visitedLocations.contains(pos)) {
             return true;
         }
@@ -120,11 +114,11 @@ public class MovementController extends ExplorerDrone implements Actions {
 
     @Override
     public boolean isTurnPoint() {
-        return turnPoints.contains(x + "," + y);
+        return turnPoints.contains(position.toString());
     }
 
     @Override
     public void markAsTurnPoint() {
-        turnPoints.add(x + "," + y);
+        turnPoints.add(position.toString());
     }
 }

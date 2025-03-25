@@ -11,15 +11,15 @@ import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses.SearchPattern;
 
-public class FindIsland extends SearchStates {
+public class MoveDiagonalState extends SearchStates {
 
-    private static final Logger logger = LogManager.getLogger(FindIsland.class);
+    private static final Logger logger = LogManager.getLogger(MoveDiagonalState.class);
 
     private final GroundSensor landDetector = new GroundSensor();
     
     private final SearchPattern searchPattern;
 
-    public FindIsland(Actions drone, Sensor sensor, Report report) {
+    public MoveDiagonalState(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
         this.searchPattern = new SearchPattern(drone, sensor);
     }
@@ -29,7 +29,7 @@ public class FindIsland extends SearchStates {
     public SearchStates getNextSearch(JSONObject command) {
         if (landDetector.foundGround(command)) {
             logger.info("Found land! Switching to GoToIsland state");
-            return new GoToIsland(drone, sensor, report, landDetector.getDistance(command));
+            return new ApproachIslandState(drone, sensor, report, landDetector.getDistance(command));
         }
 
         searchPattern.executeNextMove();

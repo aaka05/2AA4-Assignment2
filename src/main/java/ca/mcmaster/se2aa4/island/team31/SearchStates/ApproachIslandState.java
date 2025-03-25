@@ -7,12 +7,12 @@ import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 
-public class GoToIsland extends SearchStates {
+public class ApproachIslandState extends SearchStates {
 
     //steps we still need to take to reach the island (reaches just one tile before island)
     private int stepsRemaining;
 
-    public GoToIsland(Actions drone, Sensor sensor, Report report, int distance) {
+    public ApproachIslandState(Actions drone, Sensor sensor, Report report, int distance) {
         super(drone, sensor, report);
         this.stepsRemaining = distance;
     }
@@ -26,6 +26,6 @@ public class GoToIsland extends SearchStates {
         }
 
         //we made it to the island - switch to on island state
-        return new OnIsland(this.drone, this.sensor, this.report);
+        return new OnIslandState(this.drone, this.sensor, this.report);
     }
 }

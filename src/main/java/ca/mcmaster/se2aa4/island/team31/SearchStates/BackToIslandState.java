@@ -11,9 +11,9 @@ import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
  
-public class BackToIsland extends SearchStates {
+public class BackToIslandState extends SearchStates {
  
-    private static final Logger logger = LogManager.getLogger(BackToIsland.class);
+    private static final Logger logger = LogManager.getLogger(BackToIslandState.class);
  
     //helper class to check if drone can see ground
     private final GroundSensor landDetector;
@@ -30,7 +30,7 @@ public class BackToIsland extends SearchStates {
     
     private TurnState currentState;
    
-    public BackToIsland(Actions drone, Sensor sensor, Report report) {
+    public BackToIslandState(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
         landDetector = new GroundSensor();
         currentState = TurnState.INITIAL;
@@ -83,9 +83,9 @@ public class BackToIsland extends SearchStates {
     
     private SearchStates handleFinalCheck(JSONObject response) {
         if (landDetector.foundGround(response)) {
-            return new GoToIsland(drone, sensor, report, landDetector.getDistance(response));
+            return new ApproachIslandState(drone, sensor, report, landDetector.getDistance(response));
         }
-        return new ReFindIsland(drone, sensor, report);
+        return new IslandRelocationState(drone, sensor, report);
     }
     
     private SearchStates determineTurnDirection() {

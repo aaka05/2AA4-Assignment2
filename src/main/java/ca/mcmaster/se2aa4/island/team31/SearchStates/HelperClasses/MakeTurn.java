@@ -10,8 +10,8 @@ import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Direction.CardinalDirection;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
 import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
-import ca.mcmaster.se2aa4.island.team31.SearchStates.BackToIsland;
-import ca.mcmaster.se2aa4.island.team31.SearchStates.GoToIsland;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.BackToIslandState;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.ApproachIslandState;
 
 public class MakeTurn extends SearchStates {
 
@@ -38,10 +38,10 @@ public class MakeTurn extends SearchStates {
         //check if we need to look for land
         if (checkLand) {
             if (landDetector.foundGround(response)) {
-                return new GoToIsland(this.drone, this.sensor, this.report, 
+                return new ApproachIslandState(this.drone, this.sensor, this.report, 
                                     landDetector.getDistance(response));
             }
-            return new BackToIsland(this.drone, this.sensor, this.report);
+            return new BackToIslandState(this.drone, this.sensor, this.report);
         }
 
         // Check if turn is complete

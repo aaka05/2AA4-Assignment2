@@ -17,10 +17,10 @@ import ca.mcmaster.se2aa4.island.team31.Detection.GroundSensor;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
-import ca.mcmaster.se2aa4.island.team31.SearchStates.FindIsland;
-import ca.mcmaster.se2aa4.island.team31.SearchStates.GoToIsland;
-import ca.mcmaster.se2aa4.island.team31.SearchStates.OnIsland;
-import ca.mcmaster.se2aa4.island.team31.SearchStates.ReFindIsland;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.MoveDiagonalState;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.ApproachIslandState;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.OnIslandState;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.IslandRelocationState;
 
 import static eu.ace_design.island.runner.Runner.run;
 public class ExampleTest {
@@ -30,7 +30,7 @@ public class ExampleTest {
     private GroundSensor landDetector;
     private Report report;
     private Constraints constraints;
-    private OnIsland onIsland;
+    private OnIslandState onIsland;
 
 
     @BeforeEach
@@ -41,7 +41,7 @@ public class ExampleTest {
         landDetector = new GroundSensor();
         report = Report.getInstance();
         constraints = new Constraints(drone);
-        onIsland = new OnIsland(drone, sensor, report);
+        onIsland = new OnIslandState(drone, sensor, report);
     
         // Need to reset the Report singleton between tests to avoid state bleeding
         Field instance = Report.class.getDeclaredField("instance");
@@ -151,16 +151,16 @@ public class ExampleTest {
         // TEST: FindIsland state transition
     @Test
     public void testFindIslandReturnsGoToIsland() {
-        FindIsland state = new FindIsland(drone, sensor, report);
+        MoveDiagonalState state = new MoveDiagonalState(drone, sensor, report);
         JSONObject response = new JSONObject()
                 .put("extras", new JSONObject().put("found", "GROUND").put("range", 2));
         SearchStates next = state.getNextSearch(response);
-        assertTrue(next instanceof GoToIsland);
+        assertTrue(next instanceof ApproachIslandState);
     }
 
     @Test
     public void testFindIslandReturnsSelfWhenNoLand() {
-        FindIsland state = new FindIsland(drone, sensor, report);
+        MoveDiagonalState state = new MoveDiagonalState(drone, sensor, report);
         JSONObject response = new JSONObject()
                 .put("extras", new JSONObject().put("found", "OUT_OF_RANGE"));
         SearchStates next = state.getNextSearch(response);
@@ -172,17 +172,17 @@ public class ExampleTest {
     public void testGoToIslandProgresses() {
         // Should transition: GoToIsland -> GoToIsland -> GoToIsland -> OnIsland
         // (takes 3 steps to reach island when distance is 2)
-        GoToIsland goTo = new GoToIsland(drone, sensor, report, 2);
+        ApproachIslandState goTo = new ApproachIslandState(drone, sensor, report, 2);
         JSONObject dummy = new JSONObject();
     
         SearchStates next1 = goTo.getNextSearch(dummy);
-        assertTrue(next1 instanceof GoToIsland);
+        assertTrue(next1 instanceof ApproachIslandState);
     
         SearchStates next2 = next1.getNextSearch(dummy);
-        assertTrue(next2 instanceof GoToIsland);  
+        assertTrue(next2 instanceof ApproachIslandState);  
     
         SearchStates next3 = next2.getNextSearch(dummy);
-        assertTrue(next3 instanceof OnIsland);   
+        assertTrue(next3 instanceof OnIslandState);   
     }
 
 
@@ -191,12 +191,12 @@ public class ExampleTest {
     // TEST: ReFindIsland state transitions
     @Test
     public void testReFindIslandTransitionsAfterLandRight() {
-    ReFindIsland state = new ReFindIsland(drone, sensor, report);
+    IslandRelocationState state = new IslandRelocationState(drone, sensor, report);
     state.getNextSearch(new JSONObject()); // echoRight
     JSONObject landRight = new JSONObject()
         .put("extras", new JSONObject().put("found", "GROUND").put("range", 1));
     SearchStates next = state.getNextSearch(landRight);
-    assertEquals(ReFindIsland.class, next.getClass()); // after turn
+    assertEquals(IslandRelocationState.class, next.getClass()); // after turn
     }
 
 
@@ -210,7 +210,7 @@ public class ExampleTest {
                 .put("biomes", new JSONArray().put("OCEAN")));
 
         SearchStates result = onIsland.getNextSearch(flyResponse);
-        assertTrue(result instanceof OnIsland); // should echoForward and wait
+        assertTrue(result instanceof OnIslandState); // should echoForward and wait
     }
 
     // 🔁 Revisit logic triggers moveForward
@@ -220,7 +220,7 @@ public class ExampleTest {
         JSONObject scanResponse = new JSONObject(); // dummy input
         SearchStates nextAfter = onIsland.getNextSearch(scanResponse); // should moveForward due to revisit
 
-        assertTrue(nextAfter instanceof OnIsland); // still in same state
+        assertTrue(nextAfter instanceof OnIslandState); // still in same state
     }
 
 

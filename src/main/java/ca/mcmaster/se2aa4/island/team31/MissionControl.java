@@ -10,15 +10,15 @@ import ca.mcmaster.se2aa4.island.team31.AbstractClasses.SearchStates;
 import ca.mcmaster.se2aa4.island.team31.Drone.Constraints;
 import ca.mcmaster.se2aa4.island.team31.Drone.MovementController;
 import ca.mcmaster.se2aa4.island.team31.Drone.Sensor;
-import ca.mcmaster.se2aa4.island.team31.SearchStates.FindIsland;
+import ca.mcmaster.se2aa4.island.team31.SearchStates.MoveDiagonalState;
 
 /**
  * main controller class for the exploration drone
  * manages state transitions, battery levels, and exploration status
  */
-public class DroneController {
+public class MissionControl {
 
-    private static final Logger log = LogManager.getLogger(DroneController.class);
+    private static final Logger log = LogManager.getLogger(MissionControl.class);
 
     //state and command management
     private SearchStates currentState;
@@ -32,7 +32,7 @@ public class DroneController {
     private final Constraints constraints;
     private final Report report;
 
-    public DroneController(int batteryLevel, String direction) {
+    public MissionControl(int batteryLevel, String direction) {
         Direction.CardinalDirection startDir = Direction.CardinalDirection.valueOf(direction);
         
         //initialize all final fields directly in constructor
@@ -40,7 +40,7 @@ public class DroneController {
         this.drone = new MovementController(batteryLevel, startDir, this.sensor);
         this.constraints = new Constraints(this.drone);
         this.report = Report.getInstance();
-        this.currentState = new FindIsland(this.drone, this.sensor, this.report);
+        this.currentState = new MoveDiagonalState(this.drone, this.sensor, this.report);
         this.tracker = new DroneActionMonitor(Arrays.asList(this.drone, this.sensor));
         
         this.explorationDone = false;

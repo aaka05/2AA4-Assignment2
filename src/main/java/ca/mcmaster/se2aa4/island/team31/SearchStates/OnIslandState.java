@@ -13,8 +13,8 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.Actions;
 import ca.mcmaster.se2aa4.island.team31.SearchStates.HelperClasses.MakeTurn;
 
 //state for exploring the island
-public class OnIsland extends SearchStates {
-    private static final Logger logger = LogManager.getLogger(OnIsland.class);
+public class OnIslandState extends SearchStates {
+    private static final Logger logger = LogManager.getLogger(OnIslandState.class);
     private final GroundSensor detector;  
 
     //control flags
@@ -27,7 +27,7 @@ public class OnIsland extends SearchStates {
     private Integer scannedSteps;    
     private Integer repeatedVisits;  
 
-    public OnIsland(Actions drone, Sensor sensor, Report report) {
+    public OnIslandState(Actions drone, Sensor sensor, Report report) {
         super(drone, sensor, report);
         detector = new GroundSensor();
         
@@ -61,12 +61,12 @@ public class OnIsland extends SearchStates {
 
     private SearchStates tryToLeaveIsland(JSONObject response) {
         if (detector.foundGround(response)) {
-            return new GoToIsland(drone, sensor, report, detector.getDistance(response));
+            return new ApproachIslandState(drone, sensor, report, detector.getDistance(response));
         }
         
         //check if stuck
         if (repeatedVisits > (int)(0.6 * scannedSteps)) {
-            return new ReFindIsland(drone, sensor, report);
+            return new IslandRelocationState(drone, sensor, report);
         }
         return new MakeTurn(drone, sensor, report);
     }
@@ -98,7 +98,7 @@ public class OnIsland extends SearchStates {
         logger.info("Performing scan");
 
         if (drone.isTurnPoint()) {
-            return new ReFindIsland(drone, sensor, report);
+            return new IslandRelocationState(drone, sensor, report);
         }
 
         if (drone.hasVisitedLocation()) {
