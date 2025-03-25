@@ -13,7 +13,7 @@ import ca.mcmaster.se2aa4.island.team31.Interfaces.DroneCommander;
 public class DroneActionMonitor implements DroneCommander {
     //stack of commands executed by the drone
     private final Deque<JSONObject> commandHistory;
-    private static final int maxHistorySize = 1000; // Prevent unbounded growth
+    private static final int maxHistorySize = 1000; //limit of commands stored
 
     public DroneActionMonitor(List<ExplorerDrone> components) {
         this.commandHistory = new LinkedList<>();
@@ -32,7 +32,7 @@ public class DroneActionMonitor implements DroneCommander {
         });
     }
 
-    //add new command to history stack
+    //command to add to history stack
     @Override
     public void addCommand(JSONObject command) {
         if (command == null) {
@@ -51,12 +51,12 @@ public class DroneActionMonitor implements DroneCommander {
         return commandHistory.isEmpty() ? null : commandHistory.peek();
     }
 
-    //new method to get all commands (immutable)
+    //method to get all commands (immutable)
     public List<JSONObject> getAllCommands() {
         return Collections.unmodifiableList(new LinkedList<>(commandHistory));
     }
 
-    //new method to clear history
+    //method to clear history
     public void clearHistory() {
         commandHistory.clear();
     }
